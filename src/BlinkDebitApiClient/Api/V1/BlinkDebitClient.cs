@@ -48,40 +48,35 @@ namespace BlinkDebitApiClient.Api.V1;
 /// </summary>
 public class BlinkDebitClient
 {
-    // TODO active profile, request-id and x-correlation-id logging
-    private readonly ILoggerFactory _loggerFactory = LoggerFactory
-        .Create(builder => builder.SetMinimumLevel(LogLevel.Debug));
+    private readonly ILogger _logger;
 
-    private ILogger<BlinkDebitClient> _logger;
+    private readonly SingleConsentsApi _singleConsentsApi;
 
-    private SingleConsentsApi _singleConsentsApi;
+    private readonly EnduringConsentsApi _enduringConsentsApi;
 
-    private EnduringConsentsApi _enduringConsentsApi;
+    private readonly QuickPaymentsApi _quickPaymentsApi;
 
-    private QuickPaymentsApi _quickPaymentsApi;
+    private readonly PaymentsApi _paymentsApi;
 
-    private PaymentsApi _paymentsApi;
+    private readonly RefundsApi _refundsApi;
 
-    private RefundsApi _refundsApi;
-
-    private BankMetadataApi _bankMetadataApi;
+    private readonly BankMetadataApi _bankMetadataApi;
 
     /// <summary>
     /// Default constructor
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="singleConsentsApi"></param>
     /// <param name="enduringConsentsApi"></param>
     /// <param name="quickPaymentsApi"></param>
     /// <param name="paymentsApi"></param>
     /// <param name="refundsApi"></param>
     /// <param name="bankMetadataApi"></param>
-    public BlinkDebitClient(SingleConsentsApi singleConsentsApi, EnduringConsentsApi enduringConsentsApi,
+    public BlinkDebitClient(ILogger logger, SingleConsentsApi singleConsentsApi, EnduringConsentsApi enduringConsentsApi,
         QuickPaymentsApi quickPaymentsApi, PaymentsApi paymentsApi, RefundsApi refundsApi,
         BankMetadataApi bankMetadataApi)
     {
-        // TODO active profile, request-id and x-correlation-id logging
-        _logger = _loggerFactory.CreateLogger<BlinkDebitClient>();
-
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _singleConsentsApi = singleConsentsApi;
         _enduringConsentsApi = enduringConsentsApi;
         _quickPaymentsApi = quickPaymentsApi;
@@ -93,21 +88,22 @@ public class BlinkDebitClient
     }
 
     /// <summary>
-    /// No-arg constructor
+    /// Constructor with ILogger
     /// </summary>
-    public BlinkDebitClient() : this(GenerateBlinkPayProperties())
+    /// <param name="logger">The logger</param>
+    public BlinkDebitClient(ILogger logger) : this(logger, GenerateBlinkPayProperties())
     {
     }
 
     /// <summary>
-    /// Constructor with BlinkPayProperties
+    /// Constructor with ILogger and BlinkPayProperties
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="blinkPayProperties">The BlinkPayProperties</param>
-    public BlinkDebitClient(BlinkPayProperties blinkPayProperties) : this(
+    public BlinkDebitClient(ILogger logger, BlinkPayProperties blinkPayProperties) : this(logger,
         Environment.GetEnvironmentVariable("BLINKPAY_DEBIT_URL") ?? blinkPayProperties.DebitUrl,
         Environment.GetEnvironmentVariable("BLINKPAY_CLIENT_ID") ?? blinkPayProperties.ClientId,
         Environment.GetEnvironmentVariable("BLINKPAY_CLIENT_SECRET") ?? blinkPayProperties.ClientSecret,
-        Environment.GetEnvironmentVariable("BLINKPAY_ACTIVE_PROFILE") ?? blinkPayProperties.ActiveProfile,
         bool.TryParse(Environment.GetEnvironmentVariable("BLINKPAY_RETRY_ENABLED"), out var retryEnabled)
             ? retryEnabled
             : blinkPayProperties.RetryEnabled
@@ -118,16 +114,15 @@ public class BlinkDebitClient
     /// <summary>
     /// The constructor with the essential parameters
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="debitUrl">The Blink Debit URL</param>
     /// <param name="clientId">The OAuth2 client ID</param>
     /// <param name="clientSecret">The OAuth2 client secret</param>
-    /// <param name="activeProfile">The active profile e.g. local, test, dev, staging, prod</param>
     /// <param name="retryEnabled">The flag if retry is enabled</param>
-    public BlinkDebitClient(string debitUrl, string clientId, string clientSecret, string activeProfile = "local",
+    public BlinkDebitClient(ILogger logger, string debitUrl, string clientId, string clientSecret,
         bool retryEnabled = true)
     {
-        // TODO active profile, request-id and x-correlation-id logging
-        _logger = _loggerFactory.CreateLogger<BlinkDebitClient>();
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         var initialConfiguration = new Configuration
         {
@@ -140,33 +135,33 @@ public class BlinkDebitClient
         };
 
         var finalConfiguration = Configuration.MergeConfigurations(GlobalConfiguration.Instance, initialConfiguration);
-        var apiClient = new ApiClient(finalConfiguration);
+        var apiClient = new ApiClient(logger, finalConfiguration);
         // TODO retry
 
-        _bankMetadataApi = new BankMetadataApi(apiClient, apiClient, finalConfiguration);
-        _singleConsentsApi = new SingleConsentsApi(apiClient, apiClient, finalConfiguration);
-        _enduringConsentsApi = new EnduringConsentsApi(apiClient, apiClient, finalConfiguration);
-        _quickPaymentsApi = new QuickPaymentsApi(apiClient, apiClient, finalConfiguration);
-        _paymentsApi = new PaymentsApi(apiClient, apiClient, finalConfiguration);
-        _refundsApi = new RefundsApi(apiClient, apiClient, finalConfiguration);
+        _bankMetadataApi = new BankMetadataApi(logger, apiClient, apiClient, finalConfiguration);
+        _singleConsentsApi = new SingleConsentsApi(logger, apiClient, apiClient, finalConfiguration);
+        _enduringConsentsApi = new EnduringConsentsApi(logger, apiClient, apiClient, finalConfiguration);
+        _quickPaymentsApi = new QuickPaymentsApi(logger, apiClient, apiClient, finalConfiguration);
+        _paymentsApi = new PaymentsApi(logger, apiClient, apiClient, finalConfiguration);
+        _refundsApi = new RefundsApi(logger, apiClient, apiClient, finalConfiguration);
     }
 
     /// <summary>
     /// Constructor with an existing API client and configuration. Retry policy, if needed, must also be configured
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="apiClient">The API client</param>
     /// <param name="configuration">The configuration</param>
-    public BlinkDebitClient(ApiClient apiClient, IReadableConfiguration configuration)
+    public BlinkDebitClient(ILogger logger, ApiClient apiClient, IReadableConfiguration configuration)
     {
-        // TODO active profile, request-id and x-correlation-id logging
-        _logger = _loggerFactory.CreateLogger<BlinkDebitClient>();
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _bankMetadataApi = new BankMetadataApi(apiClient, apiClient, configuration);
-        _singleConsentsApi = new SingleConsentsApi(apiClient, apiClient, configuration);
-        _enduringConsentsApi = new EnduringConsentsApi(apiClient, apiClient, configuration);
-        _quickPaymentsApi = new QuickPaymentsApi(apiClient, apiClient, configuration);
-        _paymentsApi = new PaymentsApi(apiClient, apiClient, configuration);
-        _refundsApi = new RefundsApi(apiClient, apiClient, configuration);
+        _bankMetadataApi = new BankMetadataApi(logger, apiClient, apiClient, configuration);
+        _singleConsentsApi = new SingleConsentsApi(logger, apiClient, apiClient, configuration);
+        _enduringConsentsApi = new EnduringConsentsApi(logger, apiClient, apiClient, configuration);
+        _quickPaymentsApi = new QuickPaymentsApi(logger, apiClient, apiClient, configuration);
+        _paymentsApi = new PaymentsApi(logger, apiClient, apiClient, configuration);
+        _refundsApi = new RefundsApi(logger, apiClient, apiClient, configuration);
         
         // TODO retry
     }

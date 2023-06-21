@@ -51,9 +51,4 @@ public class BlinkPayProperties
     /// The OAuth2 client secret
     /// </summary>
     public string ClientSecret { get; set; }
-
-    /// <summary>
-    /// The active profile or environment e.g. local, test, dev, staging, prod
-    /// </summary>
-    public string ActiveProfile { get; set; } = "local";
 }

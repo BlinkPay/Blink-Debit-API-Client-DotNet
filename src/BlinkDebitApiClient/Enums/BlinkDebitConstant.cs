@@ -32,6 +32,8 @@ public enum BlinkDebitConstant
     REQUEST_ID,
     CORRELATION_ID,
     IDEMPOTENCY_KEY,
+    CUSTOMER_IP,
+    AUTHORIZATION,
     BEARER
 }
 
@@ -53,6 +55,8 @@ public static class BlinkDebitConstantExtensions
             BlinkDebitConstant.REQUEST_ID => "request-id",
             BlinkDebitConstant.CORRELATION_ID => "x-correlation-id",
             BlinkDebitConstant.IDEMPOTENCY_KEY => "idempotency-key",
+            BlinkDebitConstant.CUSTOMER_IP => "x-customer-ip",
+            BlinkDebitConstant.AUTHORIZATION => "Authorization",
             BlinkDebitConstant.BEARER => "Bearer ",
             _ => throw new ArgumentOutOfRangeException(nameof(constant), constant, "Unknown BlinkDebitConstant")
         };

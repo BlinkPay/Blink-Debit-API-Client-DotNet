@@ -25,8 +25,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using BlinkDebitApiClient.Client;
 using BlinkDebitApiClient.Config;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
+using Microsoft.Extensions.Logging;
 
 namespace BlinkDebitApiClient.Api.V1;
 
@@ -270,28 +272,25 @@ public interface ISingleConsentsApi : ISingleConsentsApiSync, ISingleConsentsApi
 /// </summary>
 public class SingleConsentsApi : ISingleConsentsApi
 {
-    private ExceptionFactory _exceptionFactory = (name, response) => null;
+    private ExceptionFactory _exceptionFactory = (name, response, logger) => null;
+
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SingleConsentsApi"/> class.
     /// </summary>
+    /// <param name="logger">The logger</param>
+    /// <param name="basePath">The base path containing the Blink Debit API URL and the default path (/payments/v1)</param>
     /// <returns></returns>
-    public SingleConsentsApi() : this((string)null)
+    public SingleConsentsApi(ILogger logger, string basePath)
     {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SingleConsentsApi"/> class.
-    /// </summary>
-    /// <returns></returns>
-    public SingleConsentsApi(string basePath)
-    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Configuration = Config.Configuration.MergeConfigurations(
             GlobalConfiguration.Instance,
             new Configuration { BasePath = basePath }
         );
-        Client = new ApiClient(Configuration);
-        AsynchronousClient = new ApiClient(Configuration);
+        Client = new ApiClient(logger, Configuration);
+        AsynchronousClient = new ApiClient(logger, Configuration);
         ExceptionFactory = Config.Configuration.DefaultExceptionFactory;
     }
 
@@ -299,18 +298,20 @@ public class SingleConsentsApi : ISingleConsentsApi
     /// Initializes a new instance of the <see cref="SingleConsentsApi"/> class
     /// using Configuration object
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="configuration">An instance of Configuration</param>
     /// <returns></returns>
-    public SingleConsentsApi(Configuration configuration)
+    public SingleConsentsApi(ILogger logger, Configuration configuration)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
         Configuration = Config.Configuration.MergeConfigurations(
             GlobalConfiguration.Instance,
             configuration
         );
-        Client = new ApiClient(Configuration);
-        AsynchronousClient = new ApiClient(Configuration);
+        Client = new ApiClient(logger, Configuration);
+        AsynchronousClient = new ApiClient(logger, Configuration);
         ExceptionFactory = Config.Configuration.DefaultExceptionFactory;
     }
 
@@ -318,12 +319,14 @@ public class SingleConsentsApi : ISingleConsentsApi
     /// Initializes a new instance of the <see cref="SingleConsentsApi"/> class
     /// using a Configuration object and client instance.
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="client">The client interface for synchronous API access.</param>
     /// <param name="asyncClient">The client interface for asynchronous API access.</param>
     /// <param name="configuration">The configuration object.</param>
-    public SingleConsentsApi(ISynchronousClient client, IAsynchronousClient asyncClient,
+    public SingleConsentsApi(ILogger logger, ISynchronousClient client, IAsynchronousClient asyncClient,
         IReadableConfiguration configuration)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Client = client ?? throw new ArgumentNullException(nameof(client));
         AsynchronousClient = asyncClient ?? throw new ArgumentNullException(nameof(asyncClient));
         Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -430,25 +433,25 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
         if (xCustomerIp != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-customer-ip",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CUSTOMER_IP.GetValue(),
                 ClientUtils.ParameterToString(xCustomerIp)); // header parameter
         }
 
         if (idempotencyKey != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("idempotency-key",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue(),
                 ClientUtils.ParameterToString(idempotencyKey)); // header parameter
         }
 
@@ -459,12 +462,12 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization",
-                    "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -478,7 +481,7 @@ public class SingleConsentsApi : ISingleConsentsApi
         // make the HTTP request
         var localVarResponse =
             Client.Post<CreateConsentResponse>("/single-consents", localVarRequestOptions, Configuration);
-        var exception = ExceptionFactory("CreateSingleConsent", localVarResponse);
+        var exception = ExceptionFactory("CreateSingleConsent", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -551,25 +554,25 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
         if (xCustomerIp != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-customer-ip",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CUSTOMER_IP.GetValue(),
                 ClientUtils.ParameterToString(xCustomerIp)); // header parameter
         }
 
         if (idempotencyKey != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("idempotency-key",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue(),
                 ClientUtils.ParameterToString(idempotencyKey)); // header parameter
         }
 
@@ -580,12 +583,12 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization",
-                    "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -600,7 +603,7 @@ public class SingleConsentsApi : ISingleConsentsApi
         var localVarResponse = await AsynchronousClient
             .PostAsync<CreateConsentResponse>("/single-consents", localVarRequestOptions, Configuration,
                 cancellationToken).ConfigureAwait(false);
-        var exception = ExceptionFactory("CreateSingleConsent", localVarResponse);
+        var exception = ExceptionFactory("CreateSingleConsent", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -660,13 +663,13 @@ public class SingleConsentsApi : ISingleConsentsApi
             ClientUtils.ParameterToString(consentId)); // path parameter
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -675,12 +678,12 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization",
-                    "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -694,7 +697,7 @@ public class SingleConsentsApi : ISingleConsentsApi
         // make the HTTP request
         var localVarResponse = Client.Get<Consent>("/single-consents/{consent_id}", localVarRequestOptions,
             Configuration);
-        var exception = ExceptionFactory("GetSingleConsent", localVarResponse);
+        var exception = ExceptionFactory("GetSingleConsent", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -757,13 +760,13 @@ public class SingleConsentsApi : ISingleConsentsApi
             ClientUtils.ParameterToString(consentId)); // path parameter
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -772,12 +775,12 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization",
-                    "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -791,7 +794,7 @@ public class SingleConsentsApi : ISingleConsentsApi
         // make the HTTP request
         var localVarResponse = await AsynchronousClient.GetAsync<Consent>("/single-consents/{consent_id}",
             localVarRequestOptions, Configuration, cancellationToken).ConfigureAwait(false);
-        var exception = ExceptionFactory("GetSingleConsent", localVarResponse);
+        var exception = ExceptionFactory("GetSingleConsent", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -847,13 +850,13 @@ public class SingleConsentsApi : ISingleConsentsApi
             ClientUtils.ParameterToString(consentId)); // path parameter
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -862,12 +865,12 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization",
-                    "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -881,7 +884,7 @@ public class SingleConsentsApi : ISingleConsentsApi
         // make the HTTP request
         var localVarResponse = Client.Delete<Object>("/single-consents/{consent_id}", localVarRequestOptions,
             Configuration);
-        var exception = ExceptionFactory("RevokeSingleConsent", localVarResponse);
+        var exception = ExceptionFactory("RevokeSingleConsent", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -942,13 +945,13 @@ public class SingleConsentsApi : ISingleConsentsApi
             ClientUtils.ParameterToString(consentId)); // path parameter
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -957,12 +960,12 @@ public class SingleConsentsApi : ISingleConsentsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization",
-                    "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -976,7 +979,7 @@ public class SingleConsentsApi : ISingleConsentsApi
         // make the HTTP request
         var localVarResponse = await AsynchronousClient.DeleteAsync<Object>("/single-consents/{consent_id}",
             localVarRequestOptions, Configuration, cancellationToken).ConfigureAwait(false);
-        var exception = ExceptionFactory("RevokeSingleConsent", localVarResponse);
+        var exception = ExceptionFactory("RevokeSingleConsent", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;

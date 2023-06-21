@@ -1,22 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
     <TargetFramework>net7.0</TargetFramework>
     <AssemblyName>BlinkDebitApiClient</AssemblyName>
     <PackageId>BlinkDebitApiClient</PackageId>
     <OutputType>Library</OutputType>
-    <Authors>OpenAPI</Authors>
-    <Company>OpenAPI</Company>
-    <AssemblyTitle>OpenAPI Library</AssemblyTitle>
-    <Description>A library generated from a OpenAPI doc</Description>
-    <Copyright>No Copyright</Copyright>
+    <Authors>Rey Vincent Babilonia (rey.babilonia@blinkpay.co.nz)</Authors>
+    <Company>BlinkPay</Company>
+    <AssemblyTitle>Blink Debit API Client for C# .NET 7</AssemblyTitle>
+    <Description>Blink Debit API Client for C# .NET 7</Description>
+    <Copyright>Copyright (c) 2023 BlinkPay</Copyright>
     <RootNamespace>BlinkDebitApiClient</RootNamespace>
     <Version>1.0.0</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\BlinkDebitApiClient.xml</DocumentationFile>
-    <RepositoryUrl>https:////.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Nullable>annotations</Nullable>
+    <PackageProjectUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet</PackageProjectUrl>
+    <PackageIcon>bp.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +42,13 @@
 
   <ItemGroup>
     <None Remove="System.Web" />
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="../../images/blinkpay.png" />
+    <None Include="..\..\images\bp.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+      <Link>bp.png</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" />

@@ -25,6 +25,7 @@ using BlinkDebitApiClient.Api.V1;
 using BlinkDebitApiClient.Client;
 using BlinkDebitApiClient.Client.Auth;
 using BlinkDebitApiClient.Config;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BlinkDebitApiClient.Test.Api.V1;
@@ -42,16 +43,22 @@ public class BlinkDebitFixture
             OAuthFlow = OAuthFlow.APPLICATION
         };
         
-        var finalConfiguration = Configuration.MergeConfigurations(GlobalConfiguration.Instance, initialConfiguration);
-        var apiClient = new ApiClient(finalConfiguration);
+        var logger = LoggerFactory
+            .Create(builder => builder
+                .AddConsole()
+                .AddDebug())
+            .CreateLogger<BlinkDebitFixture>();
         
-        BankMetadataApi = new BankMetadataApi(apiClient, apiClient, finalConfiguration);
-        SingleConsentsApi = new SingleConsentsApi(apiClient, apiClient, finalConfiguration);
-        EnduringConsentsApi = new EnduringConsentsApi(apiClient, apiClient, finalConfiguration);
-        QuickPaymentsApi = new QuickPaymentsApi(apiClient, apiClient, finalConfiguration);
-        PaymentsApi = new PaymentsApi(apiClient, apiClient, finalConfiguration);
-        RefundsApi = new RefundsApi(apiClient, apiClient, finalConfiguration);
-        BlinkDebitClient = new BlinkDebitClient(apiClient, finalConfiguration);
+        var finalConfiguration = Configuration.MergeConfigurations(GlobalConfiguration.Instance, initialConfiguration);
+        var apiClient = new ApiClient(logger, finalConfiguration);
+        
+        BankMetadataApi = new BankMetadataApi(logger, apiClient, apiClient, finalConfiguration);
+        SingleConsentsApi = new SingleConsentsApi(logger, apiClient, apiClient, finalConfiguration);
+        EnduringConsentsApi = new EnduringConsentsApi(logger, apiClient, apiClient, finalConfiguration);
+        QuickPaymentsApi = new QuickPaymentsApi(logger, apiClient, apiClient, finalConfiguration);
+        PaymentsApi = new PaymentsApi(logger, apiClient, apiClient, finalConfiguration);
+        RefundsApi = new RefundsApi(logger, apiClient, apiClient, finalConfiguration);
+        BlinkDebitClient = new BlinkDebitClient(logger, apiClient, finalConfiguration);
     }
 
     public BankMetadataApi BankMetadataApi { get; }

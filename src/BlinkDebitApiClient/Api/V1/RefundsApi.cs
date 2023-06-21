@@ -25,8 +25,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using BlinkDebitApiClient.Client;
 using BlinkDebitApiClient.Config;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
+using Microsoft.Extensions.Logging;
 
 namespace BlinkDebitApiClient.Api.V1;
 
@@ -191,64 +193,65 @@ public interface IRefundsApi : IRefundsApiSync, IRefundsApiAsync
 /// </summary>
 public class RefundsApi : IRefundsApi
 {
-    private ExceptionFactory _exceptionFactory = (name, response) => null;
+    private ExceptionFactory _exceptionFactory = (name, response, logger) => null;
+
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RefundsApi"/> class.
     /// </summary>
+    /// <param name="logger">The logger</param>
+    /// <param name="basePath">The base path containing the Blink Debit API URL and the default path (/payments/v1)</param>
     /// <returns></returns>
-    public RefundsApi() : this((string)null)
+    public RefundsApi(ILogger logger, string basePath)
     {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RefundsApi"/> class.
-    /// </summary>
-    /// <returns></returns>
-    public RefundsApi(string basePath)
-    {
-        Configuration = BlinkDebitApiClient.Config.Configuration.MergeConfigurations(
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        Configuration = Config.Configuration.MergeConfigurations(
             GlobalConfiguration.Instance,
             new Configuration { BasePath = basePath }
         );
-        Client = new ApiClient(Configuration);
-        AsynchronousClient = new ApiClient(Configuration);
-        ExceptionFactory = BlinkDebitApiClient.Config.Configuration.DefaultExceptionFactory;
+        Client = new ApiClient(logger, Configuration);
+        AsynchronousClient = new ApiClient(logger, Configuration);
+        ExceptionFactory = Config.Configuration.DefaultExceptionFactory;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RefundsApi"/> class
     /// using Configuration object
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="configuration">An instance of Configuration</param>
     /// <returns></returns>
-    public RefundsApi(Configuration configuration)
+    public RefundsApi(ILogger logger, Configuration configuration)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-        Configuration = BlinkDebitApiClient.Config.Configuration.MergeConfigurations(
+        Configuration = Config.Configuration.MergeConfigurations(
             GlobalConfiguration.Instance,
             configuration
         );
-        Client = new ApiClient(Configuration);
-        AsynchronousClient = new ApiClient(Configuration);
-        ExceptionFactory = BlinkDebitApiClient.Config.Configuration.DefaultExceptionFactory;
+        Client = new ApiClient(logger, Configuration);
+        AsynchronousClient = new ApiClient(logger, Configuration);
+        ExceptionFactory = Config.Configuration.DefaultExceptionFactory;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RefundsApi"/> class
     /// using a Configuration object and client instance.
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="client">The client interface for synchronous API access.</param>
     /// <param name="asyncClient">The client interface for asynchronous API access.</param>
     /// <param name="configuration">The configuration object.</param>
-    public RefundsApi(ISynchronousClient client, IAsynchronousClient asyncClient,
+    public RefundsApi(ILogger logger, ISynchronousClient client, IAsynchronousClient asyncClient,
         IReadableConfiguration configuration)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         Client = client ?? throw new ArgumentNullException(nameof(client));
         AsynchronousClient = asyncClient ?? throw new ArgumentNullException(nameof(asyncClient));
         Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        ExceptionFactory = BlinkDebitApiClient.Config.Configuration.DefaultExceptionFactory;
+        ExceptionFactory = Config.Configuration.DefaultExceptionFactory;
     }
 
     /// <summary>
@@ -343,13 +346,13 @@ public class RefundsApi : IRefundsApi
 
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -360,11 +363,12 @@ public class RefundsApi : IRefundsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -377,7 +381,7 @@ public class RefundsApi : IRefundsApi
 
         // make the HTTP request
         var localVarResponse = Client.Post<RefundResponse>("/refunds", localVarRequestOptions, Configuration);
-        var exception = ExceptionFactory("CreateRefund", localVarResponse);
+        var exception = ExceptionFactory("CreateRefund", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -441,13 +445,13 @@ public class RefundsApi : IRefundsApi
 
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -458,11 +462,12 @@ public class RefundsApi : IRefundsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -477,7 +482,7 @@ public class RefundsApi : IRefundsApi
         var localVarResponse = await AsynchronousClient
             .PostAsync<RefundResponse>("/refunds", localVarRequestOptions, Configuration, cancellationToken)
             .ConfigureAwait(false);
-        var exception = ExceptionFactory("CreateRefund", localVarResponse);
+        var exception = ExceptionFactory("CreateRefund", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -534,13 +539,13 @@ public class RefundsApi : IRefundsApi
             ClientUtils.ParameterToString(refundId)); // path parameter
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -549,11 +554,12 @@ public class RefundsApi : IRefundsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -566,7 +572,7 @@ public class RefundsApi : IRefundsApi
 
         // make the HTTP request
         var localVarResponse = Client.Get<Refund>("/refunds/{refund_id}", localVarRequestOptions, Configuration);
-        var exception = ExceptionFactory("GetRefund", localVarResponse);
+        var exception = ExceptionFactory("GetRefund", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;
@@ -629,13 +635,13 @@ public class RefundsApi : IRefundsApi
             ClientUtils.ParameterToString(refundId)); // path parameter
         if (requestId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("request-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.REQUEST_ID.GetValue(),
                 ClientUtils.ParameterToString(requestId)); // header parameter
         }
 
         if (xCorrelationId != null)
         {
-            localVarRequestOptions.HeaderParameters.Add("x-correlation-id",
+            localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
                 ClientUtils.ParameterToString(xCorrelationId)); // header parameter
         }
 
@@ -644,11 +650,12 @@ public class RefundsApi : IRefundsApi
 
         // authentication (Bearer) required
         // oauth required
-        if (!localVarRequestOptions.HeaderParameters.ContainsKey("Authorization"))
+        if (!localVarRequestOptions.HeaderParameters.ContainsKey(BlinkDebitConstant.AUTHORIZATION.GetValue()))
         {
             if (!string.IsNullOrEmpty(Configuration.AccessToken))
             {
-                localVarRequestOptions.HeaderParameters.Add("Authorization", "Bearer " + Configuration.AccessToken);
+                localVarRequestOptions.HeaderParameters.Add(BlinkDebitConstant.AUTHORIZATION.GetValue(),
+                    BlinkDebitConstant.BEARER.GetValue() + Configuration.AccessToken);
             }
             else if (!string.IsNullOrEmpty(Configuration.OAuthTokenUrl) &&
                      !string.IsNullOrEmpty(Configuration.OAuthClientId) &&
@@ -663,7 +670,7 @@ public class RefundsApi : IRefundsApi
         var localVarResponse = await AsynchronousClient
             .GetAsync<Refund>("/refunds/{refund_id}", localVarRequestOptions, Configuration, cancellationToken)
             .ConfigureAwait(false);
-        var exception = ExceptionFactory("GetRefund", localVarResponse);
+        var exception = ExceptionFactory("GetRefund", localVarResponse, _logger);
         if (exception != null)
         {
             throw exception;

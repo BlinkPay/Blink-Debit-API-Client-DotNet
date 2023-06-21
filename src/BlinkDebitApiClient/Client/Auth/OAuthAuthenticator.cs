@@ -24,6 +24,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using BlinkDebitApiClient.Config;
+using BlinkDebitApiClient.Enums;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Authenticators;
@@ -76,7 +77,7 @@ public class OAuthAuthenticator : AuthenticatorBase
         if (!string.IsNullOrEmpty(Token))
         {
             var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(Token.Replace("Bearer ", string.Empty));
+            var token = handler.ReadJwtToken(Token.Replace(BlinkDebitConstant.BEARER.GetValue(), string.Empty));
             var expiry = TimeZoneInfo.ConvertTime(token.ValidTo, NzTimeZone);
             var now = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, NzTimeZone);
             if (expiry > now)

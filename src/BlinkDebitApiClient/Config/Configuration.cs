@@ -28,7 +28,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using BlinkDebitApiClient.Client;
 using BlinkDebitApiClient.Client.Auth;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
 using Microsoft.Extensions.Logging;
@@ -57,22 +59,14 @@ public class Configuration : IReadableConfiguration
     // ReSharper disable once InconsistentNaming
     public const string ISO8601_DATETIME_FORMAT = "o";
 
-    /// <summary>
-    /// Create a logger factory
-    /// </summary>
-    private readonly ILoggerFactory _loggerFactory = LoggerFactory
-        .Create(builder => builder.SetMinimumLevel(LogLevel.Debug));
-
     #endregion Constants
 
     #region Static Members
 
-    private static ILogger<Configuration> _logger;
-
     /// <summary>
     /// Default creation of exceptions for a given method name and response object
     /// </summary>
-    public static readonly ExceptionFactory DefaultExceptionFactory = (methodName, response) =>
+    public static readonly ExceptionFactory DefaultExceptionFactory = (methodName, response, logger) =>
     {
         var status = (int)response.StatusCode;
         if (status < 400) return null;
@@ -82,49 +76,60 @@ public class Configuration : IReadableConfiguration
         switch (status)
         {
             case 401:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkUnauthorisedException(body.Message);
             case 403:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkForbiddenException(body.Message);
             case 404:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkResourceNotFoundException(body.Message);
             case 408:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkRequestTimeoutException(body.Message);
             case 422:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkUnauthorisedException(body.Message);
             case 429:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkRateLimitExceededException(body.Message);
             case 501:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkNotImplementedException(body.Message);
             case 502:
                 return new BlinkServiceException($"Service call to Blink Debit failed with error: " +
-                                                 $"{body.Message}, please contact BlinkPay with the request ID: " +
-                                                 $"{response.Headers["request-id"]}");
+                                                 $"{body.Message}, please contact BlinkPay with the correlation ID: " +
+                                                 $"{response.Headers[BlinkDebitConstant.CORRELATION_ID.GetValue()]}");
             case >= 400 and < 500:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkClientException(body.Message);
             case >= 500:
-                _logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status, response.Headers,
-                    body.Message);
+                logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
+                    SanitiseHeaders(response.Headers), body.Message);
                 throw new BlinkServiceException(body.Message);
         }
 
         return null;
     };
+    
+    private static string SanitiseHeaders(Multimap<string, string> headers)
+    {
+        var map = new Dictionary<string, IList<string>>(headers);
+
+        return string.Join(",", map.Select(kvp =>
+        {
+            var argValue = ClientUtils.ParameterToString(kvp.Value);
+            return $"{kvp.Key}:{argValue}";
+        }));
+    }
 
     #endregion Static Members
 
@@ -174,7 +179,6 @@ public class Configuration : IReadableConfiguration
     [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
     public Configuration()
     {
-        _logger = _loggerFactory.CreateLogger<Configuration>();
         Proxy = null;
         UserAgent = WebUtility.UrlEncode("C#/Blink SDK 1.0");
         BasePath = "https://sandbox.debit.blinkpay.co.nz/payments/v1";
@@ -210,7 +214,6 @@ public class Configuration : IReadableConfiguration
         IDictionary<string, string> apiKeyPrefix,
         string basePath = "https://sandbox.debit.blinkpay.co.nz/payments/v1") : this()
     {
-        _logger = _loggerFactory.CreateLogger<Configuration>();
         if (string.IsNullOrWhiteSpace(basePath))
             throw new ArgumentException("The provided basePath is invalid.", "basePath");
         if (defaultHeaders == null)

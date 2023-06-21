@@ -34,6 +34,7 @@ using BlinkDebitApiClient.Config;
 using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Polly;
@@ -49,7 +50,7 @@ namespace BlinkDebitApiClient.Client;
 internal class CustomJsonCodec : IRestSerializer, ISerializer, IDeserializer
 {
     private readonly IReadableConfiguration _configuration;
-    
+
     private static readonly ContentType _contentType = ContentType.Json;
 
     private readonly JsonSerializerSettings _serializerSettings = new()
@@ -88,10 +89,8 @@ internal class CustomJsonCodec : IRestSerializer, ISerializer, IDeserializer
             // the object to be serialized is an oneOf/anyOf schema
             return ((AbstractOpenAPISchema)obj).ToJson();
         }
-        else
-        {
-            return JsonConvert.SerializeObject(obj, _serializerSettings);
-        }
+
+        return JsonConvert.SerializeObject(obj, _serializerSettings);
     }
 
     public string Serialize(Parameter bodyParameter) => Serialize(bodyParameter.Value);
@@ -167,7 +166,7 @@ internal class CustomJsonCodec : IRestSerializer, ISerializer, IDeserializer
     public ISerializer Serializer => this;
     public IDeserializer Deserializer => this;
 
-    public string[] AcceptedContentTypes => RestSharp.ContentType.JsonAccept;
+    public string[] AcceptedContentTypes => ContentType.JsonAccept;
 
     public SupportsContentType SupportsContentType => contentType =>
         contentType.Value.EndsWith("json", StringComparison.InvariantCultureIgnoreCase) ||
@@ -186,9 +185,11 @@ internal class CustomJsonCodec : IRestSerializer, ISerializer, IDeserializer
 /// Provides a default implementation of an Api client (both synchronous and asynchronous implementations),
 /// encapsulating general REST accessor use cases.
 /// </summary>
-public partial class ApiClient : ISynchronousClient, IAsynchronousClient
+public class ApiClient : ISynchronousClient, IAsynchronousClient
 {
     private readonly string _baseUrl;
+
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Specifies the settings on a <see cref="JsonSerializer" /> object.
@@ -211,59 +212,96 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
     /// Allows for extending request processing for <see cref="ApiClient"/> generated code.
     /// </summary>
     /// <param name="request">The RestSharp request object</param>
-    private static void InterceptRequest(RestRequest request)
+    /// <param name="options">The RequestOptions</param>
+    private void InterceptRequest(RestRequest request, RequestOptions options)
     {
-        // TODO use logger
-        // TODO sanitise authorization request header ("***REDACTED BEARER TOKEN***")
-        // TODO clone the request to add a new correlation ID even for retries
-        // ClientRequest modifiedClientRequest = ClientRequest.from(clientRequest)
-        //     .header(CORRELATION_ID.getValue(), UUID.randomUUID().toString())
-        //     .build();
-        //
-        // log.debug("Action: {} {}\nHeaders: {}\nBody: {}", clientRequest.method(), clientRequest.url(),
-        //     sanitiseHeaders(modifiedClientRequest.headers()), request);
+        var present = options.HeaderParameters.ContainsKey(BlinkDebitConstant.CORRELATION_ID.GetValue());
+        var correlationId = "";
+        if (present)
+        {
+            correlationId = ClientUtils.ParameterToString(options.HeaderParameters[BlinkDebitConstant.CORRELATION_ID.GetValue()]);
+            if (string.IsNullOrEmpty(correlationId))
+            {
+                correlationId = Guid.NewGuid().ToString();
+                options.HeaderParameters.Add(BlinkDebitConstant.CORRELATION_ID.GetValue(),
+                    ClientUtils.ParameterToString(correlationId)); // header parameter
+            }
+        }
+
         request.OnBeforeDeserialization = resp =>
         {
-            Console.WriteLine("REQUEST:");
-            Console.WriteLine("URL: " + resp.ResponseUri);
-            Console.WriteLine("Method: " + resp.Request.Method);
-            Console.WriteLine("Headers: " + string.Join(", ", resp.Headers));
-            Console.WriteLine("Content: " + request.Parameters
-                .Where(param => param.Type == ParameterType.RequestBody)
-                .Select(param => param.Value)
-                .FirstOrDefault());
+            using (_logger.BeginScope($"CorrelationId: {correlationId}"))
+            {
+                var body = request.Parameters
+                    .Where(param => param.Type == ParameterType.RequestBody)
+                    .Select(param => param.Value)
+                    .FirstOrDefault();
+
+                _logger.LogDebug("Action: {method} {url}\nHeaders: {headers}\nBody: {body}", request.Method,
+                    request.Resource, SanitiseHeaders(options.HeaderParameters), body);
+            }
         };
+    }
+    
+    private static string SanitiseHeaders(Multimap<string, string> headers)
+    {
+        var map = new Dictionary<string, IList<string>>(headers);
+
+        if (map.TryGetValue(BlinkDebitConstant.AUTHORIZATION.GetValue(), out var authorizations))
+        {
+            for (int i = 0; i < authorizations.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(authorizations[i]))
+                {
+                    authorizations[i] = "***REDACTED BEARER TOKEN***";
+                    break;
+                }
+            }
+        }
+
+        return string.Join(",", map.Select(kvp =>
+        {
+            var argValue = ClientUtils.ParameterToString(kvp.Value);
+            return $"{kvp.Key}:{argValue}";
+        }));
     }
 
     /// <summary>
     /// Allows for extending response processing for <see cref="ApiClient"/> generated code.
     /// </summary>
-    /// <param name="request">The RestSharp request object</param>
     /// <param name="response">The RestSharp response object</param>
-    private static void InterceptResponse(RestRequest request, RestResponse response)
+    private void InterceptResponse(RestResponseBase response)
     {
-        // TODO use logger
-        Console.WriteLine("RESPONSE:");
-        Console.WriteLine("Status Code: " + response.StatusCode);
-        Console.WriteLine("Headers: " + string.Join(", ", response.Headers));
-        Console.WriteLine("Content: " + response.Content);
+        var correlationId = response.Headers?.SingleOrDefault(h =>
+                h.Name.Equals(BlinkDebitConstant.CORRELATION_ID.GetValue(), StringComparison.OrdinalIgnoreCase))?.Value
+            .ToString();
+
+        using (_logger.BeginScope($"CorrelationId: {correlationId}"))
+        {
+            _logger.LogDebug("Status Code: {code}\nHeaders: {headers}\nBody: {body}", response.StatusCode,
+                string.Join(", ", response.Headers), response.Content);
+        }
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiClient" />, defaulting to the global configurations' base url.
     /// </summary>
-    public ApiClient()
+    /// <param name="logger">The logger</param>
+    public ApiClient(ILogger logger)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _baseUrl = GlobalConfiguration.Instance.BasePath;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiClient" />
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="basePath">The target service's base path in URL format.</param>
     /// <exception cref="ArgumentException"></exception>
-    public ApiClient(string basePath)
+    public ApiClient(ILogger logger, string basePath)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (string.IsNullOrEmpty(basePath))
             throw new ArgumentException("basePath cannot be empty");
 
@@ -273,10 +311,12 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
     /// <summary>
     /// Initializes a new instance of the <see cref="ApiClient" />
     /// </summary>
+    /// <param name="logger">The logger</param>
     /// <param name="configuration">The configuration</param>
     /// <exception cref="ArgumentException">Thrown when base path is null or empty</exception>
-    public ApiClient(IReadableConfiguration configuration)
+    public ApiClient(ILogger logger, IReadableConfiguration configuration)
     {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (string.IsNullOrEmpty(configuration.BasePath))
             throw new ArgumentException("basePath cannot be empty");
 
@@ -319,7 +359,7 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
                 other = RestSharpMethod.Patch;
                 break;
             default:
-                throw new ArgumentOutOfRangeException("method", method, null);
+                throw new ArgumentOutOfRangeException(nameof(method), method, null);
         }
 
         return other;
@@ -340,9 +380,9 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
     private RestRequest NewRequest(HttpMethod method, string path, RequestOptions options,
         IReadableConfiguration configuration)
     {
-        if (path == null) throw new ArgumentNullException("path");
-        if (options == null) throw new ArgumentNullException("options");
-        if (configuration == null) throw new ArgumentNullException("configuration");
+        if (path == null) throw new ArgumentNullException(nameof(path));
+        if (options == null) throw new ArgumentNullException(nameof(options));
+        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
         var request = new RestRequest(path, Method(method));
 
@@ -415,10 +455,7 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
                     {
                         request.RequestFormat = DataFormat.Json;
                     }
-                    else
-                    {
-                        // TODO: Generated client user should add additional handlers. RestSharp only supports XML and JSON, with XML as default.
-                    }
+                    // TODO: Generated client user should add additional handlers. RestSharp only supports XML and JSON, with XML as default.
                 }
                 else
                 {
@@ -520,7 +557,7 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
         var client = new RestClient(clientOptions,
             configureSerialization: s => s.UseSerializer(() => new CustomJsonCodec(SerializerSettings, configuration)));
 
-        InterceptRequest(req);
+        InterceptRequest(req, options);
 
         RestResponse<T> response;
         if (RetryConfiguration.RetryPolicy != null)
@@ -564,7 +601,7 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
             response.Data = (T)(object)response.Content;
         }
 
-        InterceptResponse(req, response);
+        InterceptResponse(response);
 
         var result = ToApiResponse(response);
         if (response.ErrorMessage != null)
@@ -619,7 +656,7 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
         var client = new RestClient(clientOptions,
             configureSerialization: s => s.UseSerializer(() => new CustomJsonCodec(SerializerSettings, configuration)));
 
-        InterceptRequest(req);
+        InterceptRequest(req, options);
 
         RestResponse<T> response;
         if (RetryConfiguration.AsyncRetryPolicy != null)
@@ -653,7 +690,7 @@ public partial class ApiClient : ISynchronousClient, IAsynchronousClient
             response.Data = (T)(object)response.RawBytes;
         }
 
-        InterceptResponse(req, response);
+        InterceptResponse(response);
 
         var result = ToApiResponse(response);
         if (response.ErrorMessage != null)

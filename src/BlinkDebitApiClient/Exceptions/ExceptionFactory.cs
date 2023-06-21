@@ -22,6 +22,7 @@
 
 using System;
 using BlinkDebitApiClient.Client;
+using Microsoft.Extensions.Logging;
 
 namespace BlinkDebitApiClient.Exceptions;
 
@@ -30,5 +31,6 @@ namespace BlinkDebitApiClient.Exceptions;
 /// </summary>
 /// <param name="methodName">Method name</param>
 /// <param name="response">Response</param>
+/// <param name="logger">The logger</param>
 /// <returns>Exceptions</returns>
-public delegate Exception ExceptionFactory(string methodName, IApiResponse response);
+public delegate Exception ExceptionFactory(string methodName, IApiResponse response, ILogger logger);
