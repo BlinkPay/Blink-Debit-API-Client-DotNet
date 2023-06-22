@@ -20,26 +20,21 @@
  * SOFTWARE.
  */
 
-using System.Text.RegularExpressions;
-using BlinkDebitApiClient.Client;
-using BlinkDebitApiClient.Config;
-using BlinkDebitApiClient.Enums;
-using BlinkDebitApiClient.Exceptions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using System.Text.Json;
+using BlinkDebitApiClient.Client;
 using BlinkDebitApiClient.Client.Auth;
+using BlinkDebitApiClient.Config;
+using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Polly;
-using Polly.Contrib.WaitAndRetry;
+using RestSharp;
 
 namespace BlinkDebitApiClient.Api.V1;
 
@@ -72,19 +67,18 @@ public class BlinkDebitClient
     /// <param name="paymentsApi"></param>
     /// <param name="refundsApi"></param>
     /// <param name="bankMetadataApi"></param>
-    public BlinkDebitClient(ILogger logger, SingleConsentsApi singleConsentsApi, EnduringConsentsApi enduringConsentsApi,
-        QuickPaymentsApi quickPaymentsApi, PaymentsApi paymentsApi, RefundsApi refundsApi,
-        BankMetadataApi bankMetadataApi)
+    public BlinkDebitClient(ILogger logger, SingleConsentsApi singleConsentsApi,
+        EnduringConsentsApi enduringConsentsApi, QuickPaymentsApi quickPaymentsApi, PaymentsApi paymentsApi,
+        RefundsApi refundsApi, BankMetadataApi bankMetadataApi)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        
         _singleConsentsApi = singleConsentsApi;
         _enduringConsentsApi = enduringConsentsApi;
         _quickPaymentsApi = quickPaymentsApi;
         _paymentsApi = paymentsApi;
         _refundsApi = refundsApi;
         _bankMetadataApi = bankMetadataApi;
-
-        // TODO retry
     }
 
     /// <summary>
@@ -120,7 +114,7 @@ public class BlinkDebitClient
     /// <param name="clientSecret">The OAuth2 client secret</param>
     /// <param name="retryEnabled">The flag if retry is enabled</param>
     public BlinkDebitClient(ILogger logger, string debitUrl, string clientId, string clientSecret,
-        bool retryEnabled = true)
+        bool? retryEnabled = true)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -133,10 +127,11 @@ public class BlinkDebitClient
             OAuthClientSecret = clientSecret,
             OAuthFlow = OAuthFlow.APPLICATION
         };
+        
+        ConfigureRetry(retryEnabled != null && retryEnabled.Value);
 
         var finalConfiguration = Configuration.MergeConfigurations(GlobalConfiguration.Instance, initialConfiguration);
         var apiClient = new ApiClient(logger, finalConfiguration);
-        // TODO retry
 
         _bankMetadataApi = new BankMetadataApi(logger, apiClient, apiClient, finalConfiguration);
         _singleConsentsApi = new SingleConsentsApi(logger, apiClient, apiClient, finalConfiguration);
@@ -162,8 +157,6 @@ public class BlinkDebitClient
         _quickPaymentsApi = new QuickPaymentsApi(logger, apiClient, apiClient, configuration);
         _paymentsApi = new PaymentsApi(logger, apiClient, apiClient, configuration);
         _refundsApi = new RefundsApi(logger, apiClient, apiClient, configuration);
-        
-        // TODO retry
     }
 
     private static BlinkPayProperties GenerateBlinkPayProperties()
@@ -178,33 +171,34 @@ public class BlinkDebitClient
         return blinkPayProperties;
     }
 
-    // TODO retry
-    // private static Retry ConfigureRetry(bool retryEnabled)
-    // {
-    //     if (!retryEnabled)
-    //     {
-    //         return null;
-    //     }
-    //
-    //     var retryConfig = RetryConfig.Custom()
-    //         .MaxAttempts(3)
-    //         .IntervalFunction(IntervalFunction.OfExponentialRandomBackoff(
-    //             TimeSpan.FromSeconds(2), 2, TimeSpan.FromSeconds(3)))
-    //         .RetryExceptions(typeof(BlinkRequestTimeoutException),
-    //             typeof(BlinkServiceException),
-    //             typeof(ConnectException),
-    //             typeof(WebClientRequestException))
-    //         .IgnoreExceptions(typeof(BlinkUnauthorisedException),
-    //             typeof(BlinkForbiddenException),
-    //             typeof(BlinkResourceNotFoundException),
-    //             typeof(BlinkRateLimitExceededException),
-    //             typeof(BlinkNotImplementedException),
-    //             typeof(BlinkClientException))
-    //         .FailAfterMaxAttempts(true)
-    //         .Build();
-    //
-    //     return Retry.Of("retry", retryConfig);
-    // }
+    private static void ConfigureRetry(bool retryEnabled)
+    {
+        if (!retryEnabled)
+        {
+            return;
+        }
+
+        var random = new Random();
+
+        var policyBuilder = Policy<RestResponse>
+            .Handle<BlinkRequestTimeoutException>()
+            .Or<BlinkServiceException>()
+            .Or<SocketException>()
+            .Or<WebException>()
+            .Or<HttpRequestException>();
+
+        RetryConfiguration.RetryPolicy = policyBuilder
+            .WaitAndRetry(3, // Number of retries
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) // Exponential back-off: 2, 4, 8 etc
+                                + TimeSpan.FromMilliseconds(random.Next(0, 1000)) // plus some milliseconds random delay
+            );
+
+        RetryConfiguration.AsyncRetryPolicy = policyBuilder
+            .WaitAndRetryAsync(3, // Number of retries
+                retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) // Exponential back-off: 2, 4, 8 etc
+                                + TimeSpan.FromMilliseconds(random.Next(0, 1000)) // plus some milliseconds random delay
+            );
+    }
 
     /// <summary>
     /// Returns the BankMetadata List
