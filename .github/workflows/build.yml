@@ -41,7 +41,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
 
       - name: Test
-        run: dotnet test --no-restore --verbosity quiet /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        run: dotnet test --no-restore --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:WarningLevel=0
         env:
           BLINKPAY_CLIENT_ID: ${{ vars.BLINKPAY_CLIENT_ID }}
           BLINKPAY_CLIENT_SECRET: ${{ secrets.BLINKPAY_CLIENT_SECRET }}
