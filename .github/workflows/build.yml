@@ -50,8 +50,9 @@ jobs:
         uses: sonarsource/sonarcloud-github-action@master
         with:
           args: >
-            -Dsonar.projectKey: blink-debit-api
-            -Dsonar.organization: blinkpay
+            -Dsonar.projectKey=blink-debit-api
+            -Dsonar.organization=blinkpay
+            -Dsonar.projectName=blink-debit-api-client-csharp-dotnet
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
