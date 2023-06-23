@@ -521,7 +521,7 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -544,7 +544,7 @@ public class BlinkDebitClientTests : IDisposable
         // retrieve
         try
         {
-            _instance.AwaitAuthorisedQuickPayment(quickPaymentId, 5);
+            _instance.AwaitSuccessfulQuickPayment(quickPaymentId, 5);
         }
         catch (Exception e)
         {
@@ -563,7 +563,7 @@ public class BlinkDebitClientTests : IDisposable
 
         try
         {
-            _instance.AwaitAuthorisedQuickPayment(consentId, 5);
+            _instance.AwaitSuccessfulQuickPayment(consentId, 5);
         }
         catch (Exception e)
         {
@@ -585,7 +585,7 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -596,7 +596,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.NotEqual(Guid.Empty, quickPaymentId);
 
         // retrieve
-        var quickPaymentResponse = _instance.AwaitAuthorisedQuickPayment(quickPaymentId, 40);
+        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPayment(quickPaymentId, 60);
 
         Assert.NotNull(quickPaymentResponse);
         Assert.Contains(quickPaymentResponse.Consent.Status,
@@ -648,7 +648,7 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -671,7 +671,7 @@ public class BlinkDebitClientTests : IDisposable
         // retrieve
         try
         {
-            _instance.AwaitAuthorisedQuickPaymentOrThrowException(quickPaymentId, 5);
+            _instance.AwaitSuccessfulQuickPaymentOrThrowException(quickPaymentId, 5);
         }
         catch (Exception e)
         {
@@ -690,7 +690,7 @@ public class BlinkDebitClientTests : IDisposable
 
         try
         {
-            _instance.AwaitAuthorisedQuickPaymentOrThrowException(consentId, 5);
+            _instance.AwaitSuccessfulQuickPaymentOrThrowException(consentId, 5);
         }
         catch (Exception e)
         {
@@ -712,7 +712,7 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -723,7 +723,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.NotEqual(Guid.Empty, quickPaymentId);
 
         // retrieve
-        var quickPaymentResponse = _instance.AwaitAuthorisedQuickPaymentOrThrowException(quickPaymentId, 40);
+        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPaymentOrThrowException(quickPaymentId, 40);
 
         Assert.NotNull(quickPaymentResponse);
         Assert.Contains(quickPaymentResponse.Consent.Status,

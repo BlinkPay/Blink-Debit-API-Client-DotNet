@@ -47,11 +47,11 @@ public class FullRefundRequest : RefundDetail, IEquatable<FullRefundRequest>, IV
     /// Initializes a new instance of the <see cref="FullRefundRequest" /> class.
     /// </summary>
     /// <param name="paymentId">The payment ID. The payment must have a status of &#x60;AcceptedSettlementCompleted&#x60;. (required).</param>
-    /// <param name="type">The refund type. (required).</param>
     /// <param name="pcr">pcr (required).</param>
     /// <param name="consentRedirect">The URI that the merchant will need to visit to authorise the refund payment from their bank, if applicable..</param>
-    public FullRefundRequest(Guid paymentId = default(Guid), TypeEnum type = default(TypeEnum),
-        Pcr pcr = default(Pcr), string consentRedirect = default(string))
+    /// <param name="type">The refund type. (required).</param>
+    public FullRefundRequest(Guid paymentId = default(Guid), Pcr pcr = default(Pcr),
+        string consentRedirect = default(string), TypeEnum type = TypeEnum.FullRefund)
     {
         PaymentId = paymentId;
         Type = type;

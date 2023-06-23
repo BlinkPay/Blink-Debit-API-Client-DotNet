@@ -48,12 +48,12 @@ public class QuickPaymentRequest : SingleConsentRequest, IEquatable<QuickPayment
     /// <summary>
     /// Initializes a new instance of the <see cref="QuickPaymentRequest" /> class.
     /// </summary>
-    /// <param name="type">Whether the consent is single or enduring. (required).</param>
     /// <param name="flow">flow (required).</param>
     /// <param name="pcr">pcr (required).</param>
     /// <param name="amount">amount (required).</param>
-    public QuickPaymentRequest(TypeEnum type = default(TypeEnum), AuthFlow flow = default(AuthFlow),
-        Pcr pcr = default(Pcr), Amount amount = default(Amount)): base(flow, pcr, amount, TypeEnum.Single)
+    /// <param name="type">Whether the consent is single or enduring. (required).</param>
+    public QuickPaymentRequest(AuthFlow flow = default(AuthFlow), Pcr pcr = default(Pcr),
+        Amount amount = default(Amount), TypeEnum type = TypeEnum.Single): base(flow, pcr, amount, TypeEnum.Single)
     {
         // Type = type;
         // Flow = flow;

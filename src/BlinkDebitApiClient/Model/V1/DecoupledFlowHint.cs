@@ -54,12 +54,12 @@ public class DecoupledFlowHint : FlowHint, IEquatable<DecoupledFlowHint>, IValid
     /// <summary>
     /// Initializes a new instance of the <see cref="DecoupledFlowHint" /> class.
     /// </summary>
-    /// <param name="type">The flow hint type, i.e. Redirect or Decoupled. (required).</param>
     /// <param name="bank">bank (required).</param>
     /// <param name="identifierType">identifierType (required).</param>
     /// <param name="identifierValue">The identifier value. (required).</param>
-    public DecoupledFlowHint(TypeEnum type = default(TypeEnum), Bank bank = default(Bank),
-        IdentifierType identifierType = default(IdentifierType), string identifierValue = default(string))
+    /// <param name="type">The flow hint type, i.e. Redirect or Decoupled. (required).</param>
+    public DecoupledFlowHint(Bank bank = default(Bank), IdentifierType identifierType = default(IdentifierType),
+        string identifierValue = default(string), TypeEnum type = TypeEnum.Decoupled)
     {
         Type = type;
         Bank = bank;

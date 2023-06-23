@@ -280,7 +280,7 @@ public class RefundsApiTests : IDisposable
         Assert.NotEqual(Guid.Empty, paymentId);
 
         // create account number refund
-        var refundRequest = new FullRefundRequest(paymentId, RefundDetail.TypeEnum.FullRefund, pcr, CallbackUrl);
+        var refundRequest = new FullRefundRequest(paymentId, pcr, CallbackUrl, RefundDetail.TypeEnum.FullRefund);
 
         try
         {
@@ -348,7 +348,7 @@ public class RefundsApiTests : IDisposable
         // create account number refund
         amount = new Amount("25.00", Amount.CurrencyEnum.NZD);
         var refundRequest =
-            new PartialRefundRequest(paymentId, RefundDetail.TypeEnum.PartialRefund, amount, pcr, CallbackUrl);
+            new PartialRefundRequest(paymentId, amount, pcr, CallbackUrl, RefundDetail.TypeEnum.PartialRefund);
 
         try
         {

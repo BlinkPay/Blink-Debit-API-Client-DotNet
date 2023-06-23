@@ -74,7 +74,7 @@ public class QuickPaymentsApiTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -185,7 +185,7 @@ public class QuickPaymentsApiTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -255,14 +255,14 @@ public class QuickPaymentsApiTests : IDisposable
     public async void QuickPaymentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
-        var redirectFlowHint = new RedirectFlowHint(FlowHint.TypeEnum.Redirect, Bank.PNZ);
+        var redirectFlowHint = new RedirectFlowHint(Bank.PNZ, FlowHint.TypeEnum.Redirect);
         var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
         var gatewayFlow = new GatewayFlow(RedirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -350,15 +350,15 @@ public class QuickPaymentsApiTests : IDisposable
     public async void QuickPaymentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
-        var decoupledFlowHint = new DecoupledFlowHint(FlowHint.TypeEnum.Decoupled, Bank.PNZ,
-            IdentifierType.PhoneNumber, "+6449144425");
+        var decoupledFlowHint = new DecoupledFlowHint(Bank.PNZ,
+            IdentifierType.PhoneNumber, "+6449144425", FlowHint.TypeEnum.Decoupled);
         var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
         var gatewayFlow = new GatewayFlow(RedirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);

@@ -169,4 +169,10 @@ public interface IReadableConfiguration
     /// </summary>
     /// <value>OAuth2 Authenticator</value>
     IAuthenticator? Authenticator { get; set; }
+
+    /// <summary>
+    /// Gets the retry flag
+    /// </summary>
+    /// <value>true if retry is enabled; false otherwise</value>
+    bool RetryEnabled { get; set; }
 }

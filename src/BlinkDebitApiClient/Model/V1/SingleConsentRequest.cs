@@ -46,12 +46,15 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
     /// <param name="amount">amount (required).</param>
     /// <param name="type">Whether the consent is single or enduring. (required).</param>
     public SingleConsentRequest(AuthFlow flow = default(AuthFlow), Pcr pcr = default(Pcr),
-        Amount amount = default(Amount), TypeEnum type = default(TypeEnum)) : base()
+        Amount amount = default(Amount), TypeEnum type = TypeEnum.Single) : base()
     {
         // to ensure "flow" is required (not null)
-        Flow = flow ?? throw new ArgumentNullException("flow is a required property for SingleConsentRequest and cannot be null");
+        Flow = flow ??
+               throw new ArgumentNullException(
+                   "flow is a required property for SingleConsentRequest and cannot be null");
         // to ensure "pcr" is required (not null)
-        Pcr = pcr ?? throw new ArgumentNullException("pcr is a required property for SingleConsentRequest and cannot be null");
+        Pcr = pcr ??
+              throw new ArgumentNullException("pcr is a required property for SingleConsentRequest and cannot be null");
         // to ensure "amount" is required (not null)
         Amount = amount ?? throw new ArgumentNullException(
             "amount is a required property for SingleConsentRequest and cannot be null");

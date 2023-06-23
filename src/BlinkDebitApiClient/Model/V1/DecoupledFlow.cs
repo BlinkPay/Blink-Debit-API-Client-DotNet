@@ -67,7 +67,7 @@ public class DecoupledFlow : AuthFlowDetail, IEquatable<DecoupledFlow>, IValidat
     /// <param name="type">Whether to use Blink Gateway, redirect or decoupled flow. (required).</param>
     public DecoupledFlow(Bank bank = default(Bank), IdentifierType identifierType = default(IdentifierType),
         string identifierValue = default(string), string callbackUrl = default(string),
-        TypeEnum type = default(TypeEnum))
+        TypeEnum type = TypeEnum.Decoupled)
     {
         Bank = bank;
         IdentifierType = identifierType;

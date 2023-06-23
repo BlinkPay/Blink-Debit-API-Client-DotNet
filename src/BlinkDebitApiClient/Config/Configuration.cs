@@ -202,6 +202,7 @@ public class Configuration : IReadableConfiguration
 
         // Setting Timeout has side effects (forces ApiClient creation).
         Timeout = 100000;
+        RetryEnabled = true;
     }
 
     /// <summary>
@@ -502,6 +503,12 @@ public class Configuration : IReadableConfiguration
     }
 
     /// <summary>
+    /// Gets the retry flag
+    /// </summary>
+    /// <value>true if retry is enabled; false otherwise</value>
+    public bool RetryEnabled { get; set; }
+
+    /// <summary>
     /// Returns URL based on server settings without providing values
     /// for the variables
     /// </summary>
@@ -683,7 +690,8 @@ public class Configuration : IReadableConfiguration
             TempFolderPath = second.TempFolderPath ?? first.TempFolderPath,
             DateTimeFormat = second.DateTimeFormat ?? first.DateTimeFormat,
             ClientCertificates = second.ClientCertificates ?? first.ClientCertificates,
-            Authenticator = second.Authenticator ?? first.Authenticator
+            Authenticator = second.Authenticator ?? first.Authenticator,
+            RetryEnabled = second.RetryEnabled
         };
         return config;
     }

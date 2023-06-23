@@ -560,7 +560,7 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
         InterceptRequest(req, options);
 
         RestResponse<T> response;
-        if (RetryConfiguration.RetryPolicy != null)
+        if (configuration.RetryEnabled && RetryConfiguration.RetryPolicy != null)
         {
             var policy = RetryConfiguration.RetryPolicy;
             var policyResult = policy.ExecuteAndCapture(() => client.Execute(req));
@@ -659,7 +659,7 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
         InterceptRequest(req, options);
 
         RestResponse<T> response;
-        if (RetryConfiguration.AsyncRetryPolicy != null)
+        if (configuration.RetryEnabled && RetryConfiguration.AsyncRetryPolicy != null)
         {
             var policy = RetryConfiguration.AsyncRetryPolicy;
             var policyResult = await policy

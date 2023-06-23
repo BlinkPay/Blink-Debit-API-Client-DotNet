@@ -244,7 +244,7 @@ public class SingleConsentsApiTests : IDisposable
     public async void SingleConsentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
-        var redirectFlowHint = new RedirectFlowHint(FlowHint.TypeEnum.Redirect, Bank.PNZ);
+        var redirectFlowHint = new RedirectFlowHint(Bank.PNZ, FlowHint.TypeEnum.Redirect);
         var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
         var gatewayFlow = new GatewayFlow(RedirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);
@@ -335,8 +335,8 @@ public class SingleConsentsApiTests : IDisposable
     public async void SingleConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
-        var decoupledFlowHint = new DecoupledFlowHint(FlowHint.TypeEnum.Decoupled, Bank.PNZ,
-            IdentifierType.PhoneNumber, "+6449144425");
+        var decoupledFlowHint = new DecoupledFlowHint(Bank.PNZ,
+            IdentifierType.PhoneNumber, "+6449144425", FlowHint.TypeEnum.Decoupled);
         var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
         var gatewayFlow = new GatewayFlow(RedirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);

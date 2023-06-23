@@ -47,12 +47,12 @@ public class PartialRefundRequest : RefundDetail, IEquatable<PartialRefundReques
     /// Initializes a new instance of the <see cref="PartialRefundRequest" /> class.
     /// </summary>
     /// <param name="paymentId">The payment ID. The payment must have a status of &#x60;AcceptedSettlementCompleted&#x60;. (required).</param>
-    /// <param name="type">The refund type. (required).</param>
     /// <param name="amount">amount (required).</param>
     /// <param name="pcr">pcr (required).</param>
     /// <param name="consentRedirect">The URI that the merchant will need to visit to authorise the refund payment from their bank, if applicable..</param>
-    public PartialRefundRequest(Guid paymentId = default(Guid), TypeEnum type = default(TypeEnum),
-        Amount amount = default(Amount), Pcr pcr = default(Pcr), string consentRedirect = default(string))
+    /// <param name="type">The refund type. (required).</param>
+    public PartialRefundRequest(Guid paymentId = default(Guid), Amount amount = default(Amount), Pcr pcr = default(Pcr),
+        string consentRedirect = default(string), TypeEnum type = TypeEnum.PartialRefund)
     {
         PaymentId = paymentId;
         Type = type;

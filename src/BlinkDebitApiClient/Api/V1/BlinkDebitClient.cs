@@ -125,7 +125,8 @@ public class BlinkDebitClient
             OAuthTokenUrl = debitUrl + "/oauth2/token",
             OAuthClientId = clientId,
             OAuthClientSecret = clientSecret,
-            OAuthFlow = OAuthFlow.APPLICATION
+            OAuthFlow = OAuthFlow.APPLICATION,
+            RetryEnabled = retryEnabled != null && retryEnabled.Value
         };
         
         ConfigureRetry(retryEnabled != null && retryEnabled.Value);
@@ -948,14 +949,14 @@ public class BlinkDebitClient
     }
 
     /// <summary>
-    /// Retrieves an authorised quick payment by ID within the specified time
+    /// Retrieves a successful quick payment by ID within the specified time
     /// </summary>
     /// <param name="quickPaymentId">The quick payment ID</param>
     /// <param name="maxWaitSeconds">The number of seconds to wait</param>
     /// <returns>QuickPaymentResponse</returns>
     /// <exception cref="BlinkConsentFailureException">Thrown when a consent exception occurs</exception>
     /// <exception cref="BlinkServiceException">Thrown when a Blink Debit service exception occurs</exception>
-    public QuickPaymentResponse AwaitAuthorisedQuickPayment(Guid quickPaymentId, int maxWaitSeconds)
+    public QuickPaymentResponse AwaitSuccessfulQuickPayment(Guid quickPaymentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<QuickPaymentResponse>
             .Handle<BlinkConsentFailureException>()
@@ -1027,18 +1028,18 @@ public class BlinkDebitClient
     }
 
     /// <summary>
-    /// Retrieves an authorised quick payment by ID within the specified time
+    /// Retrieves a successful quick payment by ID within the specified time
     /// </summary>
     /// <param name="quickPaymentId">The quick payment ID</param>
     /// <param name="maxWaitSeconds">The number of seconds to wait</param>
     /// <returns>QuickPaymentResponse</returns>
     /// <exception cref="BlinkConsentFailureException">Thrown when a consent exception occurs</exception>
     /// <exception cref="BlinkServiceException">Thrown when a Blink Debit service exception occurs</exception>
-    public QuickPaymentResponse AwaitAuthorisedQuickPaymentOrThrowException(Guid quickPaymentId, int maxWaitSeconds)
+    public QuickPaymentResponse AwaitSuccessfulQuickPaymentOrThrowException(Guid quickPaymentId, int maxWaitSeconds)
     {
         try
         {
-            return AwaitAuthorisedQuickPaymentAsync(quickPaymentId, maxWaitSeconds).Result;
+            return AwaitSuccessfulQuickPaymentAsync(quickPaymentId, maxWaitSeconds).Result;
         }
         catch (BlinkConsentTimeoutException)
         {
@@ -1068,7 +1069,7 @@ public class BlinkDebitClient
     }
 
     /// <summary>
-    /// Retrieves an authorised quick payment by ID within the specified time. The consent statuses are handled accordingly.
+    /// Retrieves a successful quick payment by ID within the specified time. The consent statuses are handled accordingly.
     /// </summary>
     /// <param name="quickPaymentId">The quick payment ID</param>
     /// <param name="maxWaitSeconds">The number of seconds to wait</param>
@@ -1076,7 +1077,7 @@ public class BlinkDebitClient
     /// <exception cref="BlinkConsentRejectedException"></exception>
     /// <exception cref="BlinkConsentTimeoutException"></exception>
     /// <exception cref="BlinkConsentFailureException"></exception>
-    public async Task<QuickPaymentResponse> AwaitAuthorisedQuickPaymentAsync(Guid quickPaymentId, int maxWaitSeconds)
+    public async Task<QuickPaymentResponse> AwaitSuccessfulQuickPaymentAsync(Guid quickPaymentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<QuickPaymentResponse>
             .Handle<BlinkConsentFailureException>()

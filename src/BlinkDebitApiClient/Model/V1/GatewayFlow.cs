@@ -52,7 +52,7 @@ public class GatewayFlow : AuthFlowDetail, IEquatable<GatewayFlow>, IValidatable
     /// <param name="flowHint">flowHint.</param>
     /// <param name="type">Whether to use Blink Gateway, redirect or decoupled flow. (required).</param>
     public GatewayFlow(string redirectUri = default(string),
-        GatewayFlowAllOfFlowHint flowHint = default(GatewayFlowAllOfFlowHint), TypeEnum type = default(TypeEnum))
+        GatewayFlowAllOfFlowHint flowHint = default(GatewayFlowAllOfFlowHint), TypeEnum type = TypeEnum.Gateway)
     {
         // to ensure "redirectUri" is required (not null)
         RedirectUri = redirectUri ??

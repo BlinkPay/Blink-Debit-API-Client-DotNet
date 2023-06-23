@@ -33,7 +33,7 @@ namespace BlinkDebitApiClient.Test.Api.V1;
 public class BlinkDebitFixture
 {
     public BlinkDebitFixture()
-    {   
+    {
         var initialConfiguration = new Configuration
         {
             BasePath = "https://sandbox.debit.blinkpay.co.nz/payments/v1",
@@ -42,16 +42,16 @@ public class BlinkDebitFixture
             OAuthClientSecret = Environment.GetEnvironmentVariable("BLINKPAY_CLIENT_SECRET") ?? string.Empty,
             OAuthFlow = OAuthFlow.APPLICATION
         };
-        
+
         var logger = LoggerFactory
             .Create(builder => builder
                 .AddConsole()
                 .AddDebug())
             .CreateLogger<BlinkDebitFixture>();
-        
+
         var finalConfiguration = Configuration.MergeConfigurations(GlobalConfiguration.Instance, initialConfiguration);
         var apiClient = new ApiClient(logger, finalConfiguration);
-        
+
         BankMetadataApi = new BankMetadataApi(logger, apiClient, apiClient, finalConfiguration);
         SingleConsentsApi = new SingleConsentsApi(logger, apiClient, apiClient, finalConfiguration);
         EnduringConsentsApi = new EnduringConsentsApi(logger, apiClient, apiClient, finalConfiguration);
@@ -72,7 +72,7 @@ public class BlinkDebitFixture
     public PaymentsApi PaymentsApi { get; }
 
     public RefundsApi RefundsApi { get; }
-    
+
     public BlinkDebitClient BlinkDebitClient { get; }
 }
 

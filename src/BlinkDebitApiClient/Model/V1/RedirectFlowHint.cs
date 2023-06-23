@@ -46,9 +46,9 @@ public class RedirectFlowHint : FlowHint, IEquatable<RedirectFlowHint>, IValidat
     /// <summary>
     /// Initializes a new instance of the <see cref="RedirectFlowHint" /> class.
     /// </summary>
-    /// <param name="type">The flow hint type, i.e. Redirect or Decoupled. (required).</param>
     /// <param name="bank">bank (required).</param>
-    public RedirectFlowHint(TypeEnum type = default(TypeEnum), Bank bank = default(Bank))
+    /// <param name="type">The flow hint type, i.e. Redirect or Decoupled. (required).</param>
+    public RedirectFlowHint(Bank bank = default(Bank), TypeEnum type = TypeEnum.Redirect)
     {
         Type = type;
         Bank = bank;

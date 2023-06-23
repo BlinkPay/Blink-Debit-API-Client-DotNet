@@ -48,7 +48,7 @@ public class AccountNumberRefundRequest : RefundDetail, IEquatable<AccountNumber
     /// </summary>
     /// <param name="paymentId">The payment ID. The payment must have a status of &#x60;AcceptedSettlementCompleted&#x60;. (required).</param>
     /// <param name="type">The refund type. (required).</param>
-    public AccountNumberRefundRequest(Guid paymentId = default(Guid), TypeEnum type = default(TypeEnum))
+    public AccountNumberRefundRequest(Guid paymentId = default(Guid), TypeEnum type = TypeEnum.AccountNumber)
     {
         PaymentId = paymentId;
         Type = type;

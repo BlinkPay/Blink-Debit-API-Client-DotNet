@@ -58,7 +58,7 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
     /// <param name="bank">bank (required).</param>
     /// <param name="type">Whether to use Blink Gateway, redirect or decoupled flow. (required).</param>
     public RedirectFlow(string redirectUri = default(string), Bank bank = default(Bank),
-        TypeEnum type = default(TypeEnum)) : base()
+        TypeEnum type = TypeEnum.Redirect) : base()
     {
         // to ensure "redirectUri" is required (not null)
         RedirectUri = redirectUri ??
