@@ -38,7 +38,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore /clp:WarningsNotAsErrors;Summary /consoleLoggerParameters:NoSummary;verbosity=quiet
+        run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
 
       - name: Test
         run: dotnet test --no-restore --verbosity quiet /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
