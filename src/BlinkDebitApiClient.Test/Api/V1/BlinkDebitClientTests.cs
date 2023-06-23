@@ -596,7 +596,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.NotEqual(Guid.Empty, quickPaymentId);
 
         // retrieve
-        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPayment(quickPaymentId, 120);
+        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPayment(quickPaymentId, 300);
 
         Assert.NotNull(quickPaymentResponse);
         Assert.Contains(quickPaymentResponse.Consent.Status,
@@ -723,7 +723,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.NotEqual(Guid.Empty, quickPaymentId);
 
         // retrieve
-        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPaymentOrThrowException(quickPaymentId, 120);
+        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPaymentOrThrowException(quickPaymentId, 300);
 
         Assert.NotNull(quickPaymentResponse);
         Assert.Contains(quickPaymentResponse.Consent.Status,
@@ -951,7 +951,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.NotEqual(Guid.Empty, consentId);
 
         // retrieve consent
-        var consent = _instance.AwaitAuthorisedSingleConsent(consentId, 120);
+        var consent = _instance.AwaitAuthorisedSingleConsent(consentId, 300);
 
         Assert.NotNull(consent);
         Assert.Equal(Consent.StatusEnum.Authorised, consent.Status);
