@@ -38,10 +38,10 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore /clp:WarningsNotAsErrors;Summary /consoleLoggerParameters:NoSummary;verbosity=quiet
 
       - name: Test
-        run: dotnet test --no-restore --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+        run: dotnet test --no-restore --verbosity quiet /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
         env:
           BLINKPAY_CLIENT_ID: ${{ vars.BLINKPAY_CLIENT_ID }}
           BLINKPAY_CLIENT_SECRET: ${{ secrets.BLINKPAY_CLIENT_SECRET }}
