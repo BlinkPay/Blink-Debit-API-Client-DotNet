@@ -49,8 +49,9 @@ jobs:
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
         with:
-          projectKey: blink-debit-api
-          organization: blinkpay
+          args: >
+            -Dsonar.projectKey: blink-debit-api
+            -Dsonar.organization: blinkpay
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
