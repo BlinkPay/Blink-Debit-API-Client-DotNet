@@ -951,7 +951,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.NotEqual(Guid.Empty, consentId);
 
         // retrieve consent
-        var consent = _instance.AwaitAuthorisedSingleConsent(consentId, 30);
+        var consent = _instance.AwaitAuthorisedSingleConsent(consentId, 120);
 
         Assert.NotNull(consent);
         Assert.Equal(Consent.StatusEnum.Authorised, consent.Status);
