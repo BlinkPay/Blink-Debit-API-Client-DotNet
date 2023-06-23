@@ -58,16 +58,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
         with:
-          args: >
-            -Dsonar.projectKey=blink-debit-api
-            -Dsonar.organization=blinkpay
-            -Dsonar.projectName=blink-debit-api-client-csharp-dotnet
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          dotnet-version: '7.0.x'
+      - name: Install SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
+      - name: SonarCloud Scan
+        run: |
+          dotnet sonarscanner begin /k:"blink-debit-api-client-csharp-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          dotnet build --configuration Release --no-restore
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
   snyk_scan:
     needs: sonarcloud_scan
@@ -78,7 +79,7 @@ jobs:
         uses: snyk/actions/dotnet@0.3.0
         with:
           command: monitor
-          args: --all-projects
+          args: src/BlinkDebitApiClient/BlinkDebitApiClient.csproj
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
