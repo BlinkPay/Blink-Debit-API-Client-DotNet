@@ -1,11 +1,8 @@
 # Blink-Debit-API-Client-CSharp-DotNet
 [![CI](https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/actions/workflows/maven-build.yml/badge.svg)](https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/actions/workflows/maven-build.yml)
-
----
-
-[![blink-debit-api-client-csharp-dotnet](https://buildstats.info/nuget/BlinkDebitApiClient)](https://www.nuget.org/packages/BlinkDebitApiClient)
+[![NuGet](https://buildstats.info/nuget/BlinkDebitApiClient)](https://www.nuget.org/packages/BlinkDebitApiClient)
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-csharp-dotnet&metric=alert_status)](https://sonarcloud.io/dashboard?id=blink-debit-api-client-csharp-dotnet)
-[![Snyk](https://snyk-widget.herokuapp.com/badge/mvn/nz.co.blinkpay/blink-debit-api-client-csharp-dotnet/latest/badge.svg)](https://security.snyk.io/package/maven/nz.co.blinkpay:blink-debit-api-client-csharp-dotnet/latest)
+[![Snyk](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/badge.svg)](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet)
 
 # Table of Contents
 1. [Minimum Requirements](#minimum-requirements)
