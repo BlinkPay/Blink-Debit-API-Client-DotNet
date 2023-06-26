@@ -46,11 +46,12 @@ jobs:
         uses: snyk/actions/dotnet@0.3.0
         with:
           command: monitor
-          args: --file=src/BlinkDebitApiClient/BlinkDebitApiClient.csproj
+          args: --all-projects
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
           SNYK_PROJECT_NAME: blink-debit-api-client-csharp-dotnet
+          WORKING_DIRECTORY: ./src/BlinkDebitApiClient
         continue-on-error: true
 
   sonar:
