@@ -42,6 +42,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: List directory structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Directory structure:"
+          ls -R
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/dotnet@0.3.0
         with:
