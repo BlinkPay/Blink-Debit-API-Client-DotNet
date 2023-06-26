@@ -90,7 +90,7 @@ jobs:
           BLINKPAY_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
   nuget_push:
-    needs: snyk_scan
+    needs: restore_build_test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
