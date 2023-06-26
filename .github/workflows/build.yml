@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
   snyk:
-    needs: restore_build_test
+    needs: cache
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -75,7 +75,7 @@ jobs:
         continue-on-error: true
 
   restore_build_test:
-    needs: cache
+    needs: sonar
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
