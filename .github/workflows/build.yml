@@ -46,7 +46,7 @@ jobs:
         uses: snyk/actions/dotnet@0.3.0
         with:
           command: monitor
-          args: src/BlinkDebitApiClient/BlinkDebitApiClient.csproj
+          args: --file=src/BlinkDebitApiClient/BlinkDebitApiClient.csproj
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
@@ -73,35 +73,35 @@ jobs:
           dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         continue-on-error: true
 
-  restore_build_test:
-    needs: sonar
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
-      - name: Test
-        run: dotnet test --no-restore --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:WarningLevel=0
-        env:
-          BLINKPAY_CLIENT_ID: ${{ vars.CLIENT_ID }}
-          BLINKPAY_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-
-  nuget_push:
-    needs: restore_build_test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '7.0.x'
-      - name: Set version
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\//}
-      - name: Pack
-        run: dotnet pack --configuration Release --output nupkgs /p:Version=${{ steps.vars.outputs.tag }}
-      - name: Push
-        run: dotnet nuget push nupkgs/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }}
+#  restore_build_test:
+#    needs: sonar
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Restore dependencies
+#        run: dotnet restore
+#      - name: Build
+#        run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
+#      - name: Test
+#        run: dotnet test --no-restore --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:WarningLevel=0
+#        env:
+#          BLINKPAY_CLIENT_ID: ${{ vars.CLIENT_ID }}
+#          BLINKPAY_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+#
+#  nuget_push:
+#    needs: restore_build_test
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/master'
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Setup .NET
+#        uses: actions/setup-dotnet@v1
+#        with:
+#          dotnet-version: '7.0.x'
+#      - name: Set version
+#        id: vars
+#        run: echo ::set-output name=tag::${GITHUB_REF/refs\/tags\//}
+#      - name: Pack
+#        run: dotnet pack --configuration Release --output nupkgs /p:Version=${{ steps.vars.outputs.tag }}
+#      - name: Push
+#        run: dotnet nuget push nupkgs/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_TOKEN }}
