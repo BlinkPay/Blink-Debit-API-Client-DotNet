@@ -27,7 +27,7 @@ namespace BlinkDebitApiClient.Exceptions;
 /// <summary>
 /// The exception thrown when consent was not completed within the bank's request timeout window.
 /// </summary>
-public class BlinkConsentTimeoutException : BlinkPaymentFailureException
+public class BlinkConsentTimeoutException : BlinkConsentFailureException
 {
     public BlinkConsentTimeoutException() : this("Consent timed out")
     {

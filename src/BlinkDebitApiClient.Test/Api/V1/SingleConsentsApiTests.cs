@@ -238,9 +238,9 @@ public class SingleConsentsApiTests : IDisposable
     }
 
     /// <summary>
-    /// Verify that single consent with redirect flow is created, retrieved and revoked in PNZ
+    /// Verify that single consent with gateway flow and redirect flow hint is created, retrieved and revoked in PNZ
     /// </summary>
-    [Fact(DisplayName = "Verify that single consent with redirect flow is created, retrieved and revoked in PNZ")]
+    [Fact(DisplayName = "Verify that single consent with gateway flow and redirect flow hint is created, retrieved and revoked in PNZ")]
     public async void SingleConsentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
@@ -329,9 +329,9 @@ public class SingleConsentsApiTests : IDisposable
     }
 
     /// <summary>
-    /// Verify that single consent with redirect flow is created, retrieved and revoked in PNZ
+    /// Verify that single consent with gateway flow and decoupled flow hint is created, retrieved and revoked in PNZ
     /// </summary>
-    [Fact(DisplayName = "Verify that single consent with redirect flow is created, retrieved and revoked in PNZ")]
+    [Fact(DisplayName = "Verify that single consent with gateway flow and decoupled flow hint is created, retrieved and revoked in PNZ")]
     public async void SingleConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create

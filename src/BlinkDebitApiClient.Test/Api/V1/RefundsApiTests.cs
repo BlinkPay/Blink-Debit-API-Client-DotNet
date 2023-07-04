@@ -77,7 +77,6 @@ public class RefundsApiTests : IDisposable
         Assert.IsType<RefundsApi>(_instance);
     }
 
-
     /// <summary>
     /// Verify that account number refund for single consent with decoupled flow is created and retrieved
     /// </summary>
@@ -279,7 +278,7 @@ public class RefundsApiTests : IDisposable
 
         Assert.NotEqual(Guid.Empty, paymentId);
 
-        // create account number refund
+        // create full refund
         var refundRequest = new FullRefundRequest(paymentId, pcr, CallbackUrl, RefundDetail.TypeEnum.FullRefund);
 
         try
@@ -292,7 +291,6 @@ public class RefundsApiTests : IDisposable
             Assert.Equal("Full refund is not yet implemented", e.Message);
         }
     }
-
 
     /// <summary>
     /// Verify that partial refund for single consent with decoupled flow is created and retrieved
@@ -345,7 +343,7 @@ public class RefundsApiTests : IDisposable
 
         Assert.NotEqual(Guid.Empty, paymentId);
 
-        // create account number refund
+        // create partial refund
         amount = new Amount("25.00", Amount.CurrencyEnum.NZD);
         var refundRequest =
             new PartialRefundRequest(paymentId, amount, pcr, CallbackUrl, RefundDetail.TypeEnum.PartialRefund);

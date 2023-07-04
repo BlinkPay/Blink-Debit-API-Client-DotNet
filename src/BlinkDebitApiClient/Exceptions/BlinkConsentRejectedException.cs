@@ -25,9 +25,9 @@ using System;
 namespace BlinkDebitApiClient.Exceptions;
 
 /// <summary>
-/// The exception thrown when single/domestic or recurring/enduring payment is rejected by the customer.
+/// The exception thrown when single/domestic or recurring/enduring consent is rejected by the customer.
 /// </summary>
-public class BlinkConsentRejectedException : BlinkPaymentFailureException
+public class BlinkConsentRejectedException : BlinkConsentFailureException
 {
     public BlinkConsentRejectedException() : this("Consent was rejected by the customer")
     {
