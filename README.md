@@ -1,22 +1,30 @@
 # Blink-Debit-API-Client-CSharp-DotNet
-[![CI](https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/actions/workflows/maven-build.yml/badge.svg)](https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/actions/workflows/maven-build.yml)
+[![CI](https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/actions/workflows/build.yml/badge.svg)]
 [![NuGet](https://buildstats.info/nuget/BlinkDebitApiClient)](https://www.nuget.org/packages/BlinkDebitApiClient)
 [![Sonar](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-csharp-dotnet&metric=alert_status)](https://sonarcloud.io/dashboard?id=blink-debit-api-client-csharp-dotnet)
 [![Snyk](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/badge.svg)](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet)
 
 # Table of Contents
-1. [Minimum Requirements](#minimum-requirements)
-2. [Dependency](#adding-the-dependency)
-3. [Quick Start](#quick-start)
-4. [Configuration](#configuration)
-5. [Client Creation](#client-creation)
-6. [Request ID, Correlation ID and Idempotency Key](#request-id-correlation-id-and-idempotency-key)
-7. [Full Examples](#full-examples)
-8. [Individual API Call Examples](#individual-api-call-examples)
+1. [Introduction](#introduction)
+2. [Contributing](#contributing)
+3. [Minimum Requirements](#minimum-requirements)
+4. [Dependency](#adding-the-dependency)
+5. [Quick Start](#quick-start)
+6. [Configuration](#configuration)
+7. [Client Creation](#client-creation)
+8. [Request ID, Correlation ID and Idempotency Key](#request-id-correlation-id-and-idempotency-key)
+9. [Full Examples](#full-examples)
+10. [Individual API Call Examples](#individual-api-call-examples)
 
-This SDK allows merchants with .NET 7-based e-commerce site to integrate with Blink PayNow and Blink AutoPay.
+## Introduction
+This SDK allows merchants with .NET 7-based e-commerce sites to seamlessly integrate with Blink PayNow and Blink AutoPay in order to accept digital payments.
 
-This SDK was written in C# 11.
+This SDK is written in C# 11.
+
+## Contributing
+We welcome contributions from the community. Your pull request will be reviewed by our team.
+
+This project is licensed under the MIT License.
 
 ## Minimum Requirements
 - .NET 7 or higher
@@ -30,6 +38,7 @@ This SDK was written in C# 11.
 ```csharp
 var logger = LoggerFactory
     .Create(builder => builder
+        .SetMinimumLevel(LogLevel.Information)
         .AddConsole()
         .AddDebug())
     .CreateLogger<MyProgram>();
@@ -38,15 +47,15 @@ var clientId = "...";
 var clientSecret = "...";
 var client = new BlinkDebitClient(logger, blinkpayUrl, clientId, clientSecret);
 
-var gatewayFlow = new GatewayFlow("https://www.blinkpay.co.nz/sample-merchant-return-page", null, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow("https://www.blinkpay.co.nz/sample-merchant-return-page");
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr("particulars", "code", "reference");
 var amount = new Amount("0.01", Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
 
 var qpCreateResponse = client.CreateQuickPayment(request);
-_logger.LogInformation("Redirect URL: {}", qpCreateResponse.RedirectUri); // Redirect the consumer to this URL
+logger.LogInformation("Redirect URL: {}", qpCreateResponse.RedirectUri); // Redirect the consumer to this URL
 var qpId = qpCreateResponse.QuickPaymentId;
 var qpResponse = client.AwaitSuccessfulQuickPaymentOrThrowException(qpId, 300); // Will throw an exception if the payment was not successful after 5min
 ```
@@ -69,16 +78,15 @@ Configuration will be detected and loaded according to the hierarchy -
 ### Configuration examples
 
 #### Environment variables
+The following values are recommended to be supplied using environment variables.
 ```shell
 export BLINKPAY_DEBIT_URL=<BLINKPAY_DEBIT_URL>
 export BLINKPAY_CLIENT_ID=<BLINKPAY_CLIENT_ID>
 export BLINKPAY_CLIENT_SECRET=<BLINKPAY_CLIENT_SECRET>
-export BLINKPAY_TIMEOUT=00:00:10
-export BLINKPAY_RETRY_ENABLED=true
 ```
 
 ### launchSettings file
-Substitute the correct values to your `Properties/launchSettings.json` file. Make sure this file is NOT pushed to the repository.
+If you prefer to use your launchSettings file, substitute the correct values to your `Properties/launchSettings.json` file.
 
 ```json
 {
@@ -87,9 +95,9 @@ Substitute the correct values to your `Properties/launchSettings.json` file. Mak
     "Demo": {
       "commandName": "Project",
       "environmentVariables": {
-        "BLINKPAY_DEBIT_URL": "<BLINKPAY_DEBIT_URL>",
-        "BLINKPAY_CLIENT_ID": "<BLINKPAY_CLIENT_ID>",
-        "BLINKPAY_CLIENT_SECRET": "<BLINKPAY_CLIENT_SECRET>",
+        "BLINKPAY_DEBIT_URL": "${BLINKPAY_DEBIT_URL}",
+        "BLINKPAY_CLIENT_ID": "${BLINKPAY_CLIENT_ID}",
+        "BLINKPAY_CLIENT_SECRET": "${BLINKPAY_CLIENT_SECRET}",
         "BLINKPAY_TIMEOUT": "00:00:10",
         "BLINKPAY_RETRY_ENABLED": "true"
       }
@@ -99,7 +107,7 @@ Substitute the correct values to your `Properties/launchSettings.json` file. Mak
 ```
 
 #### appsettings file
-Substitute the correct values to your `appsettings.json` file. The `ClientId` and `ClientSecret` have been omitted so as NOT to accidentally push it to the repository.
+If you prefer to use your appsettings file, you can also substitute the correct values to your `appsettings.json` file.
 ```json
 {
     "Logging": {
@@ -110,7 +118,9 @@ Substitute the correct values to your `appsettings.json` file. The `ClientId` an
         }
     },
     "BlinkPay": {
-        "DebitUrl": "<BLINK_DEBIT_URL>",
+        "DebitUrl": "${BLINK_DEBIT_URL}",
+        "ClientId": "${BLINKPAY_CLIENT_ID}",
+        "ClientSecret": "${BLINKPAY_CLIENT_SECRET}",
         "Timeout": "00:00:10",
         "RetryEnabled": "true"
     }
@@ -189,12 +199,12 @@ A request can have one request ID and one idempotency key but multiple correlati
 ### Quick payment (one-off payment), using Gateway flow
 A quick payment is a one-off payment that combines the API calls needed for both the consent and the payment.
 ```csharp
-var gatewayFlow = new GatewayFlow("https://www.blinkpay.co.nz/sample-merchant-return-page", null, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow("https://www.blinkpay.co.nz/sample-merchant-return-page");
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr("particulars", "code", "reference");
 var amount = new Amount("0.01", Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
 
 var qpCreateResponse = client.CreateQuickPayment(request);
 _logger.LogInformation("Redirect URL: {}", qpCreateResponse.RedirectUri); // Redirect the consumer to this URL
@@ -204,12 +214,12 @@ var qpResponse = client.AwaitSuccessfulQuickPaymentOrThrowException(qpId, 300); 
 
 ### Single consent followed by one-off payment, using Gateway flow
 ```csharp
-var redirectFlow = new RedirectFlow("https://www.blinkpay.co.nz/sample-merchant-return-page", Bank.BNZ, AuthFlowDetail.TypeEnum.Redirect);
+var redirectFlow = new RedirectFlow("https://www.blinkpay.co.nz/sample-merchant-return-page", Bank.BNZ);
 var authFlowDetail = new AuthFlowDetail(redirectFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr("particulars");
 var amount = new Amount("0.01", Amount.CurrencyEnum.NZD);
-var request = new SingleConsentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new SingleConsentRequest(authFlow, pcr, amount);
 
 var createConsentResponse = client.CreateSingleConsent(consent);
 var redirectUri = createConsentResponse.RedirectUri; // Redirect the consumer to this URL
@@ -232,12 +242,12 @@ var bankMetadataList = client.GetMeta();
 ### Quick Payments
 #### Gateway Flow
 ```csharp
-var gatewayFlow = new GatewayFlow(redirectUri, null, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
@@ -245,49 +255,48 @@ var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```csharp
 var redirectFlowHint = new RedirectFlowHint(bank, FlowHint.TypeEnum.Redirect);
 var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
-var gatewayFlow = new GatewayFlow(redirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
 #### Gateway Flow - Decoupled Flow Hint
 ```csharp
-var decoupledFlowHint = new DecoupledFlowHint(bank, identifierType, identifierValue,
-    FlowHint.TypeEnum.Decoupled);
+var decoupledFlowHint = new DecoupledFlowHint(bank, identifierType, identifierValue);
 var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
-var gatewayFlow = new GatewayFlow(redirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
 #### Redirect Flow
 ```csharp
-var redirectFlow = new RedirectFlow(redirectUri, bank, AuthFlowDetail.TypeEnum.Redirect);
+var redirectFlow = new RedirectFlow(redirectUri, bank);
 var authFlowDetail = new AuthFlowDetail(redirectFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
 #### Decoupled Flow
 ```csharp
 var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue,
-    callbackUrl, AuthFlowDetail.TypeEnum.Decoupled);
+    callbackUrl);
 var authFlowDetail = new AuthFlowDetail(decoupledFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
@@ -303,12 +312,12 @@ client.RevokeQuickPayment(quickPaymentId);
 ### Single/One-Off Consents
 #### Gateway Flow
 ```csharp
-var gatewayFlow = new GatewayFlow(redirectUri, null, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new SingleConsentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new SingleConsentRequest(authFlow, pcr, amount);
 
 var createConsentResponse = client.CreateSingleConsent(request);
 ```
@@ -316,38 +325,37 @@ var createConsentResponse = client.CreateSingleConsent(request);
 ```csharp
 var redirectFlowHint = new RedirectFlowHint(bank, FlowHint.TypeEnum.Redirect);
 var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
-var gatewayFlow = new GatewayFlow(redirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new SingleConsentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new SingleConsentRequest(authFlow, pcr, amount);
 
 var createConsentResponse = client.CreateSingleConsent(request);
 ```
 #### Gateway Flow - Decoupled Flow Hint
 ```csharp
-var decoupledFlowHint = new DecoupledFlowHint(bank, identifierType, identifierValue,
-    FlowHint.TypeEnum.Decoupled);
+var decoupledFlowHint = new DecoupledFlowHint(bank, identifierType, identifierValue);
 var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
-var gatewayFlow = new GatewayFlow(redirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new SingleConsentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new SingleConsentRequest(authFlow, pcr, amount);
 
 CreateConsentResponse createConsentResponse = client.CreateSingleConsent(request);
 ```
 #### Redirect Flow
 Suitable for most consents.
 ```csharp
-var redirectFlow = new RedirectFlow(redirectUri, bank, AuthFlowDetail.TypeEnum.Redirect);
+var redirectFlow = new RedirectFlow(redirectUri, bank);
 var authFlowDetail = new AuthFlowDetail(redirectFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new SingleConsentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new SingleConsentRequest(authFlow, pcr, amount);
 
 var createConsentResponse = client.CreateSingleConsent(request);
 ```
@@ -357,12 +365,12 @@ This flow type allows better support for mobile by allowing the supply of a mobi
 The customer will receive the consent request directly to their online banking app. This flow does not send the user through a web redirect flow.
 ```csharp
 var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue,
-    callbackUrl, AuthFlowDetail.TypeEnum.Decoupled);
+    callbackUrl);
 var authFlowDetail = new AuthFlowDetail(decoupledFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new SingleConsentRequest(authFlow, pcr, amount, ConsentDetail.TypeEnum.Single);
+var request = new SingleConsentRequest(authFlow, pcr, amount);
 
 var createConsentResponse = client.CreateSingleConsent(request);
 ```
@@ -382,13 +390,12 @@ Request an ongoing authorisation from the customer to debit their account on a r
 Note that such an authorisation can be revoked by the customer in their mobile banking app.
 #### Gateway Flow
 ```csharp
-var gatewayFlow = new GatewayFlow(redirectUri, null, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount,
-    ConsentDetail.TypeEnum.Enduring);
+var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount);
 
 var createConsentResponse = client.CreateEnduringConsent(request);
 ```
@@ -396,51 +403,46 @@ var createConsentResponse = client.CreateEnduringConsent(request);
 ```csharp
 var redirectFlowHint = new RedirectFlowHint(bank, FlowHint.TypeEnum.Redirect);
 var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
-var gatewayFlow = new GatewayFlow(redirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount,
-    ConsentDetail.TypeEnum.Enduring);
+var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount);
 
 var createConsentResponse = client.CreateEnduringConsent(request);
 ```
 #### Gateway Flow - Decoupled Flow Hint
 ```csharp
-var decoupledFlowHint = new DecoupledFlowHint(bank, identifierType, identifierValue,
-    FlowHint.TypeEnum.Decoupled);
+var decoupledFlowHint = new DecoupledFlowHint(bank, identifierType, identifierValue);
 var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
-var gatewayFlow = new GatewayFlow(redirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount,
-    ConsentDetail.TypeEnum.Enduring);
+var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount);
 
 var createConsentResponse = client.CreateEnduringConsent(request);
 ```
 #### Redirect Flow
 ```csharp
-var redirectFlow = new RedirectFlow(redirectUri, bank, AuthFlowDetail.TypeEnum.Redirect);
+var redirectFlow = new RedirectFlow(redirectUri, bank;
 var authFlowDetail = new AuthFlowDetail(redirectFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount,
-    ConsentDetail.TypeEnum.Enduring);
+var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount);
 
 var createConsentResponse = client.CreateEnduringConsent(request);
 ```
 #### Decoupled Flow
 ```csharp
 var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue,
-    callbackUrl, AuthFlowDetail.TypeEnum.Decoupled);
+    callbackUrl);
 var authFlowDetail = new AuthFlowDetail(decoupledFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount,
-    ConsentDetail.TypeEnum.Enduring);
+var request = new EnduringConsentRequest(authFlow, startDate, endDate, period, amount);
     
 var createConsentResponse = client.CreateEnduringConsent(request);
 ```
@@ -491,14 +493,14 @@ var payment = client.GetPayment(paymentId);
 ### Refunds
 #### Account Number Refund
 ```csharp
-var request = new AccountNumberRefundRequest(paymentId, RefundDetail.TypeEnum.AccountNumber);
+var request = new AccountNumberRefundRequest(paymentId);
 
 var refundResponse = client.CreateRefund(request);
 ```
 #### Full Refund (Not yet implemented)
 ```csharp
 var pcr = new Pcr(particulars, code, reference);
-var request = new FullRefundRequest(paymentId, pcr, redirectUri, RefundDetail.TypeEnum.FullRefund);
+var request = new FullRefundRequest(paymentId, pcr, redirectUri);
 
 var refundResponse = client.CreateRefund(request);
 ```
@@ -506,7 +508,7 @@ var refundResponse = client.CreateRefund(request);
 ```csharp
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
 var pcr = new Pcr(particulars, code, reference);
-var request = new PartialRefundRequest(paymentId, amount pcr, redirectUri, RefundDetail.TypeEnum.PartialRefund);
+var request = new PartialRefundRequest(paymentId, amount pcr, redirectUri);
 
 var refundResponse = client.CreateRefund(request);
 ```
