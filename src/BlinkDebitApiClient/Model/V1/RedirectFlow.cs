@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using JsonSubTypes;
 using Newtonsoft.Json;
 
@@ -62,7 +63,7 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
     {
         // to ensure "redirectUri" is required (not null)
         RedirectUri = redirectUri ??
-                      throw new ArgumentNullException(
+                      throw new BlinkInvalidValueException(
                           "redirectUri is a required property for RedirectFlow and cannot be null");
         Bank = bank;
         Type = type;

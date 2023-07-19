@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -53,13 +54,13 @@ public class SingleConsentRequestAllOf : IEquatable<SingleConsentRequestAllOf>, 
         Amount amount = default(Amount))
     {
         // to ensure "flow" is required (not null)
-        Flow = flow ?? throw new ArgumentNullException(
+        Flow = flow ?? throw new BlinkInvalidValueException(
             "flow is a required property for SingleConsentRequestAllOf and cannot be null");
         // to ensure "pcr" is required (not null)
-        Pcr = pcr ?? throw new ArgumentNullException(
+        Pcr = pcr ?? throw new BlinkInvalidValueException(
             "pcr is a required property for SingleConsentRequestAllOf and cannot be null");
         // to ensure "amount" is required (not null)
-        Amount = amount ?? throw new ArgumentNullException(
+        Amount = amount ?? throw new BlinkInvalidValueException(
             "amount is a required property for SingleConsentRequestAllOf and cannot be null");
     }
 

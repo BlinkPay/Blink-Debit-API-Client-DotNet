@@ -30,6 +30,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
 using BlinkDebitApiClient.Config;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Client;
@@ -234,9 +235,9 @@ public static class ClientUtils
     private static bool HasEnumMemberAttrValue(object enumVal)
     {
         if (enumVal == null)
-            throw new ArgumentNullException(nameof(enumVal));
+            throw new BlinkInvalidValueException(nameof(enumVal) + " cannot be null");
         var enumType = enumVal.GetType();
-        var memInfo = enumType.GetMember(enumVal.ToString() ?? throw new InvalidOperationException());
+        var memInfo = enumType.GetMember(enumVal.ToString() ?? throw new BlinkClientException());
         var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
         if (attr != null) return true;
         return false;
@@ -250,9 +251,9 @@ public static class ClientUtils
     private static string GetEnumMemberAttrValue(object enumVal)
     {
         if (enumVal == null)
-            throw new ArgumentNullException(nameof(enumVal));
+            throw new BlinkInvalidValueException(nameof(enumVal) + " cannot be null");
         var enumType = enumVal.GetType();
-        var memInfo = enumType.GetMember(enumVal.ToString() ?? throw new InvalidOperationException());
+        var memInfo = enumType.GetMember(enumVal.ToString() ?? throw new BlinkClientException());
         var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
         return attr != null ? attr.Value : null;
     }

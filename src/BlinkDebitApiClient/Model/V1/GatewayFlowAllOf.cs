@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -52,7 +53,7 @@ public class GatewayFlowAllOf : IEquatable<GatewayFlowAllOf>, IValidatableObject
         GatewayFlowAllOfFlowHint flowHint = default(GatewayFlowAllOfFlowHint))
     {
         // to ensure "redirectUri" is required (not null)
-        RedirectUri = redirectUri ?? throw new ArgumentNullException(
+        RedirectUri = redirectUri ?? throw new BlinkInvalidValueException(
             "redirectUri is a required property for GatewayFlowAllOf and cannot be null");
         FlowHint = flowHint;
     }

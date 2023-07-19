@@ -1,8 +1,14 @@
-# Blink-Debit-API-Client-CSharp-DotNet
-[![CI](https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/actions/workflows/build.yml/badge.svg)]
-[![NuGet](https://buildstats.info/nuget/BlinkDebitApiClient)](https://www.nuget.org/packages/BlinkDebitApiClient)
-[![Sonar](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-csharp-dotnet&metric=alert_status)](https://sonarcloud.io/dashboard?id=blink-debit-api-client-csharp-dotnet)
-[![Snyk](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet/badge.svg)](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet)
+# Blink-Debit-API-Client-DotNet
+[![CI](https://github.com/BlinkPay/Blink-Debit-API-Client-DotNet/actions/workflows/build.yml/badge.svg)](https://github.com/BlinkPay/Blink-Debit-API-Client-DotNet/actions/workflows/build.yml)
+[![NuGet](https://img.shields.io/nuget/v/BlinkDebitApiClient)](https://www.nuget.org/packages/BlinkDebitApiClient)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=bugs)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
+[![Known Vulnerabilities](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-DotNet/badge.svg)](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-DotNet)
 
 # Table of Contents
 1. [Introduction](#introduction)
@@ -32,7 +38,7 @@ This project is licensed under the MIT License.
 ## Adding the dependency
 - If via your IDE, look for `BlinkDebitApiClient` in the NuGet tool
 - If via .NET command line interface, run `dotnet add package BlinkDebitApiClient --version`
-- If via `.csproj` file, add `<PackageReference Include="BlinkDebitApiClient" Version="1.0.1"/>`
+- If via `.csproj` file, add `<PackageReference Include="BlinkDebitApiClient" Version="<LATEST_VERSION>"/>`
 
 ## Quick Start
 ```csharp
@@ -43,21 +49,26 @@ var logger = LoggerFactory
         .AddDebug())
     .CreateLogger<MyProgram>();
 var blinkpayUrl = "https://sandbox.debit.blinkpay.co.nz";
-var clientId = "...";
-var clientSecret = "...";
-var client = new BlinkDebitClient(logger, blinkpayUrl, clientId, clientSecret);
+var clientId = "";
+var clientSecret = "";
+var timeout = 10000;
+var client = new BlinkDebitClient(logger, blinkpayUrl, clientId, clientSecret, timeout);
 
 var gatewayFlow = new GatewayFlow("https://www.blinkpay.co.nz/sample-merchant-return-page");
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr("particulars", "code", "reference");
 var amount = new Amount("0.01", Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+var request = new QuickPaymentRequest(authFlow, pcr, amount);
 
-var qpCreateResponse = client.CreateQuickPayment(request);
-logger.LogInformation("Redirect URL: {}", qpCreateResponse.RedirectUri); // Redirect the consumer to this URL
-var qpId = qpCreateResponse.QuickPaymentId;
-var qpResponse = client.AwaitSuccessfulQuickPaymentOrThrowException(qpId, 300); // Will throw an exception if the payment was not successful after 5min
+try {
+    var qpCreateResponse = client.CreateQuickPayment(request);
+    logger.LogInformation("Redirect URL: {}", qpCreateResponse.RedirectUri); // Redirect the consumer to this URL
+    var qpId = qpCreateResponse.QuickPaymentId;
+    var qpResponse = client.AwaitSuccessfulQuickPaymentOrThrowException(qpId, 300); // Will throw an exception if the payment was not successful after 5min
+} catch (BlinkServiceException e) {
+    logger.LogError("Encountered an error: " + e.Message);
+}
 ```
 
 ## Configuration
@@ -86,8 +97,7 @@ export BLINKPAY_CLIENT_SECRET=<BLINKPAY_CLIENT_SECRET>
 ```
 
 ### launchSettings file
-If you prefer to use your launchSettings file, substitute the correct values to your `Properties/launchSettings.json` file.
-
+If you want to use your launchSettings file locally, substitute the correct values to your `Properties/launchSettings.json` file. Do not commit this file into your repository.
 ```json
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
@@ -95,10 +105,10 @@ If you prefer to use your launchSettings file, substitute the correct values to 
     "Demo": {
       "commandName": "Project",
       "environmentVariables": {
-        "BLINKPAY_DEBIT_URL": "${BLINKPAY_DEBIT_URL}",
-        "BLINKPAY_CLIENT_ID": "${BLINKPAY_CLIENT_ID}",
-        "BLINKPAY_CLIENT_SECRET": "${BLINKPAY_CLIENT_SECRET}",
-        "BLINKPAY_TIMEOUT": "00:00:10",
+        "BLINKPAY_DEBIT_URL": "<BLINKPAY_DEBIT_URL>",
+        "BLINKPAY_CLIENT_ID": "<BLINKPAY_CLIENT_ID>",
+        "BLINKPAY_CLIENT_SECRET": "<BLINKPAY_CLIENT_SECRET>",
+        "BLINKPAY_TIMEOUT": "10000",
         "BLINKPAY_RETRY_ENABLED": "true"
       }
     }
@@ -107,7 +117,7 @@ If you prefer to use your launchSettings file, substitute the correct values to 
 ```
 
 #### appsettings file
-If you prefer to use your appsettings file, you can also substitute the correct values to your `appsettings.json` file.
+To use your appsettings file, you can pass environment variables from command line or CI/CD for the placeholders into your `appsettings.json` file.
 ```json
 {
     "Logging": {
@@ -118,11 +128,11 @@ If you prefer to use your appsettings file, you can also substitute the correct 
         }
     },
     "BlinkPay": {
-        "DebitUrl": "${BLINK_DEBIT_URL}",
-        "ClientId": "${BLINKPAY_CLIENT_ID}",
-        "ClientSecret": "${BLINKPAY_CLIENT_SECRET}",
-        "Timeout": "00:00:10",
-        "RetryEnabled": "true"
+        "DebitUrl": "{BLINKPAY_DEBIT_URL}",
+        "ClientId": "{BLINKPAY_CLIENT_ID}",
+        "ClientSecret": "{BLINKPAY_CLIENT_SECRET}",
+        "Timeout": 10000,
+        "RetryEnabled": true
     }
 }
 ```
@@ -196,6 +206,7 @@ An optional request ID, correlation ID and idempotency key can be added as argum
 A request can have one request ID and one idempotency key but multiple correlation IDs in case of retries.
 
 ## Full Examples
+> **Note:** For error handling, a BlinkServiceException can be caught.
 ### Quick payment (one-off payment), using Gateway flow
 A quick payment is a one-off payment that combines the API calls needed for both the consent and the payment.
 ```csharp
@@ -204,7 +215,7 @@ var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr("particulars", "code", "reference");
 var amount = new Amount("0.01", Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+var request = new QuickPaymentRequest(authFlow, pcr, amount);
 
 var qpCreateResponse = client.CreateQuickPayment(request);
 _logger.LogInformation("Redirect URL: {}", qpCreateResponse.RedirectUri); // Redirect the consumer to this URL
@@ -247,20 +258,20 @@ var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+var request = new QuickPaymentRequest(authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
 #### Gateway Flow - Redirect Flow Hint
 ```csharp
-var redirectFlowHint = new RedirectFlowHint(bank, FlowHint.TypeEnum.Redirect);
+var redirectFlowHint = new RedirectFlowHint(bank);
 var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
 var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+var request = new QuickPaymentRequest(authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
@@ -273,7 +284,7 @@ var authFlowDetail = new AuthFlowDetail(gatewayFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+var request = new QuickPaymentRequest(authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
@@ -284,19 +295,18 @@ var authFlowDetail = new AuthFlowDetail(redirectFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+var request = new QuickPaymentRequest(authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
 #### Decoupled Flow
 ```csharp
-var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue,
-    callbackUrl);
+var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue, callbackUrl);
 var authFlowDetail = new AuthFlowDetail(decoupledFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var request = new QuickPaymentRequest(ConsentDetail.TypeEnum.Single, authFlow, pcr, amount);
+var request = new QuickPaymentRequest(authFlow, pcr, amount);
 
 var createQuickPaymentResponse = client.CreateQuickPayment(request);
 ```
@@ -323,7 +333,7 @@ var createConsentResponse = client.CreateSingleConsent(request);
 ```
 #### Gateway Flow - Redirect Flow Hint
 ```csharp
-var redirectFlowHint = new RedirectFlowHint(bank, FlowHint.TypeEnum.Redirect);
+var redirectFlowHint = new RedirectFlowHint(bank);
 var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
 var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
@@ -364,8 +374,7 @@ This flow type allows better support for mobile by allowing the supply of a mobi
 
 The customer will receive the consent request directly to their online banking app. This flow does not send the user through a web redirect flow.
 ```csharp
-var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue,
-    callbackUrl);
+var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue, callbackUrl);
 var authFlowDetail = new AuthFlowDetail(decoupledFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var pcr = new Pcr(particulars, code, reference);
@@ -401,7 +410,7 @@ var createConsentResponse = client.CreateEnduringConsent(request);
 ```
 #### Gateway Flow - Redirect Flow Hint
 ```csharp
-var redirectFlowHint = new RedirectFlowHint(bank, FlowHint.TypeEnum.Redirect);
+var redirectFlowHint = new RedirectFlowHint(bank);
 var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
 var gatewayFlow = new GatewayFlow(redirectUri, flowHint);
 var authFlowDetail = new AuthFlowDetail(gatewayFlow);
@@ -437,8 +446,7 @@ var createConsentResponse = client.CreateEnduringConsent(request);
 ```
 #### Decoupled Flow
 ```csharp
-var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue,
-    callbackUrl);
+var decoupledFlow = new DecoupledFlow(bank, identifierType, identifierValue, callbackUrl);
 var authFlowDetail = new AuthFlowDetail(decoupledFlow);
 var authFlow = new AuthFlow(authFlowDetail);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);

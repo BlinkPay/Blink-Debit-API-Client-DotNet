@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -54,11 +55,11 @@ public class BankMetadataFeatures : IEquatable<BankMetadataFeatures>, IValidatab
     {
         // to ensure "enduringConsent" is required (not null)
         EnduringConsent = enduringConsent ??
-                          throw new ArgumentNullException(
+                          throw new BlinkInvalidValueException(
                               "enduringConsent is a required property for BankMetadataFeatures and cannot be null");
         // to ensure "decoupledFlow" is required (not null)
         DecoupledFlow = decoupledFlow ??
-                        throw new ArgumentNullException(
+                        throw new BlinkInvalidValueException(
                             "decoupledFlow is a required property for BankMetadataFeatures and cannot be null");
     }
 

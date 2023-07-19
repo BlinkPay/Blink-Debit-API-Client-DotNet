@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -57,7 +58,7 @@ public class FullRefundRequest : RefundDetail, IEquatable<FullRefundRequest>, IV
         Type = type;
         // to ensure "pcr" is required (not null)
         Pcr = pcr ??
-              throw new ArgumentNullException(
+              throw new BlinkInvalidValueException(
                   "pcr is a required property for FullRefundRequest and cannot be null");
         ConsentRedirect = consentRedirect;
     }

@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -69,7 +70,7 @@ public class DecoupledFlowAllOf : IEquatable<DecoupledFlowAllOf>, IValidatableOb
         IdentifierType = identifierType;
         // to ensure "identifierValue" is required (not null)
         IdentifierValue = identifierValue ??
-                          throw new ArgumentNullException(
+                          throw new BlinkInvalidValueException(
                               "identifierValue is a required property for DecoupledFlowAllOf and cannot be null");
         CallbackUrl = callbackUrl;
     }

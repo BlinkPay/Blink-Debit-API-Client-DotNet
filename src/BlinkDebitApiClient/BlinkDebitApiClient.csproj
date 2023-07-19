@@ -8,16 +8,16 @@
     <OutputType>Library</OutputType>
     <Authors>Rey Vincent Babilonia (rey.babilonia@blinkpay.co.nz)</Authors>
     <Company>BlinkPay</Company>
-    <AssemblyTitle>Blink Debit API Client for C# .NET 7</AssemblyTitle>
-    <Description>Blink Debit API Client for C# .NET 7</Description>
+    <AssemblyTitle>Blink Debit API Client for .NET 7</AssemblyTitle>
+    <Description>Blink Debit API Client for .NET 7</Description>
     <Copyright>Copyright (c) 2023 BlinkPay</Copyright>
     <RootNamespace>BlinkDebitApiClient</RootNamespace>
     <Version>1.0.0-SNAPSHOT</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\BlinkDebitApiClient.xml</DocumentationFile>
-    <RepositoryUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-DotNet.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Nullable>annotations</Nullable>
-    <PackageProjectUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-CSharp-DotNet</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-DotNet</PackageProjectUrl>
     <PackageIcon>bp.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -42,7 +42,6 @@
   <ItemGroup>
     <None Remove="System.Web" />
     <None Include="../../README.md" Pack="true" PackagePath="\" />
-    <None Include="../../images/blinkpay.png" />
     <None Include="..\..\images\bp.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

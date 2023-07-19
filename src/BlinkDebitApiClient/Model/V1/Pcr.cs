@@ -26,6 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -54,7 +55,7 @@ public class Pcr : IEquatable<Pcr>, IValidatableObject
         string reference = default(string))
     {
         // to ensure "particulars" is required (not null)
-        Particulars = particulars ?? throw new ArgumentNullException("particulars is a required property for Pcr and cannot be null");
+        Particulars = particulars ?? throw new BlinkInvalidValueException("particulars is a required property for Pcr and cannot be null");
         Code = code;
         Reference = reference;
     }

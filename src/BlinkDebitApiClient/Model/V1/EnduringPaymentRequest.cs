@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -52,11 +53,11 @@ public class EnduringPaymentRequest : IEquatable<EnduringPaymentRequest>, IValid
     {
         // to ensure "pcr" is required (not null)
         Pcr = pcr ??
-              throw new ArgumentNullException(
+              throw new BlinkInvalidValueException(
                   "pcr is a required property for EnduringPaymentRequest and cannot be null");
         // to ensure "amount" is required (not null)
         Amount = amount ??
-                 throw new ArgumentNullException(
+                 throw new BlinkInvalidValueException(
                      "amount is a required property for EnduringPaymentRequest and cannot be null");
     }
 

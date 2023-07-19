@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -58,7 +59,7 @@ public class DetailErrorResponseModel : IEquatable<DetailErrorResponseModel>, IV
     {
         // to ensure "message" is required (not null)
         Message = message ??
-                  throw new ArgumentNullException(
+                  throw new BlinkInvalidValueException(
                       "message is a required property for DetailErrorResponseModel and cannot be null");
         Timestamp = timestamp;
         Status = status;

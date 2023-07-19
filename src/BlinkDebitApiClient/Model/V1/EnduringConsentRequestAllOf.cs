@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -62,12 +63,12 @@ public class EnduringConsentRequestAllOf : IEquatable<EnduringConsentRequestAllO
         Amount maximumAmountPeriod = default(Amount))
     {
         // to ensure "flow" is required (not null)
-        Flow = flow ?? throw new ArgumentNullException(
+        Flow = flow ?? throw new BlinkInvalidValueException(
             "flow is a required property for EnduringConsentRequestAllOf and cannot be null");
         FromTimestamp = fromTimestamp;
         Period = period;
         // to ensure "maximumAmountPeriod" is required (not null)
-        MaximumAmountPeriod = maximumAmountPeriod ?? throw new ArgumentNullException(
+        MaximumAmountPeriod = maximumAmountPeriod ?? throw new BlinkInvalidValueException(
             "maximumAmountPeriod is a required property for EnduringConsentRequestAllOf and cannot be null");
         ExpiryTimestamp = expiryTimestamp;
     }

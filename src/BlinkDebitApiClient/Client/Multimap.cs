@@ -23,6 +23,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using BlinkDebitApiClient.Exceptions;
 
 namespace BlinkDebitApiClient.Client;
 
@@ -91,7 +92,7 @@ public class Multimap<TKey, TValue> : IDictionary<TKey, IList<TValue>>
     public void Add(KeyValuePair<TKey, IList<TValue>> item)
     {
         if (!TryAdd(item.Key, item.Value))
-            throw new InvalidOperationException("Could not add values to Multimap.");
+            throw new BlinkClientException("Could not add values to Multimap.");
     }
 
     /// <summary>
@@ -103,7 +104,7 @@ public class Multimap<TKey, TValue> : IDictionary<TKey, IList<TValue>>
         foreach (var item in multimap)
         {
             if (!TryAdd(item.Key, item.Value))
-                throw new InvalidOperationException("Could not add values to Multimap.");
+                throw new BlinkClientException("Could not add values to Multimap.");
         }
     }
 
@@ -165,7 +166,7 @@ public class Multimap<TKey, TValue> : IDictionary<TKey, IList<TValue>>
     /// </summary>
     /// <param name="key">The object to use as the key of the item to add.</param>
     /// <param name="value">The object to use as the value of the item to add.</param>
-    /// <exception cref="InvalidOperationException">Thrown when couldn't add the value to Multimap.</exception>
+    /// <exception cref="BlinkClientException">Thrown when couldn't add the value to Multimap.</exception>
     public void Add(TKey key, IList<TValue> value)
     {
         if (value != null && value.Count > 0)
@@ -178,7 +179,7 @@ public class Multimap<TKey, TValue> : IDictionary<TKey, IList<TValue>>
             {
                 list = new List<TValue>(value);
                 if (!TryAdd(key, list))
-                    throw new InvalidOperationException("Could not add values to Multimap.");
+                    throw new BlinkClientException("Could not add values to Multimap.");
             }
         }
     }
@@ -256,7 +257,7 @@ public class Multimap<TKey, TValue> : IDictionary<TKey, IList<TValue>>
     /// </summary>
     /// <param name="key">The object to use as the key of the item to add.</param>
     /// <param name="value">The object to use as the value of the item to add.</param>
-    /// <exception cref="InvalidOperationException">Thrown when couldn't add value to Multimap.</exception>
+    /// <exception cref="BlinkClientException">Thrown when couldn't add value to Multimap.</exception>
     public void Add(TKey key, TValue value)
     {
         if (value != null)
@@ -269,7 +270,7 @@ public class Multimap<TKey, TValue> : IDictionary<TKey, IList<TValue>>
             {
                 list = new List<TValue> { value };
                 if (!TryAdd(key, list))
-                    throw new InvalidOperationException("Could not add value to Multimap.");
+                    throw new BlinkClientException("Could not add value to Multimap.");
             }
         }
     }

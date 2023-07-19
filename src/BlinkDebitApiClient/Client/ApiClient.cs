@@ -175,7 +175,7 @@ internal class CustomJsonCodec : IRestSerializer, ISerializer, IDeserializer
     public ContentType ContentType
     {
         get => _contentType;
-        set => throw new InvalidOperationException("Not allowed to set content type.");
+        set => throw new BlinkClientException("Not allowed to set content type.");
     }
 
     public DataFormat DataFormat => DataFormat.Json;
@@ -289,7 +289,7 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
     /// <param name="logger">The logger</param>
     public ApiClient(ILogger logger)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
         _baseUrl = GlobalConfiguration.Instance.BasePath;
     }
 
@@ -298,12 +298,12 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
     /// </summary>
     /// <param name="logger">The logger</param>
     /// <param name="basePath">The target service's base path in URL format.</param>
-    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="BlinkInvalidValueException"></exception>
     public ApiClient(ILogger logger, string basePath)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
         if (string.IsNullOrEmpty(basePath))
-            throw new ArgumentException("basePath cannot be empty");
+            throw new BlinkInvalidValueException("basePath cannot be empty");
 
         _baseUrl = basePath;
     }
@@ -313,12 +313,12 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
     /// </summary>
     /// <param name="logger">The logger</param>
     /// <param name="configuration">The configuration</param>
-    /// <exception cref="ArgumentException">Thrown when base path is null or empty</exception>
+    /// <exception cref="BlinkInvalidValueException"></exception>
     public ApiClient(ILogger logger, IReadableConfiguration configuration)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
         if (string.IsNullOrEmpty(configuration.BasePath))
-            throw new ArgumentException("basePath cannot be empty");
+            throw new BlinkInvalidValueException("basePath cannot be empty");
 
         _baseUrl = configuration.BasePath;
         configuration.Authenticator ??= new OAuthAuthenticator(configuration.OAuthTokenUrl,
@@ -376,13 +376,13 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
     /// <param name="configuration">A per-request configuration object. It is assumed that any merge with
     /// GlobalConfiguration has been done before calling this method.</param>
     /// <returns>[private] A new RestRequest instance.</returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="BlinkInvalidValueException"></exception>
     private RestRequest NewRequest(HttpMethod method, string path, RequestOptions options,
         IReadableConfiguration configuration)
     {
-        if (path == null) throw new ArgumentNullException(nameof(path));
-        if (options == null) throw new ArgumentNullException(nameof(options));
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+        if (path == null) throw new BlinkInvalidValueException(nameof(path) + " cannot be null");
+        if (options == null) throw new BlinkInvalidValueException(nameof(options) + " cannot be null");
+        if (configuration == null) throw new BlinkInvalidValueException(nameof(configuration) + " cannot be null");
 
         var request = new RestRequest(path, Method(method));
 

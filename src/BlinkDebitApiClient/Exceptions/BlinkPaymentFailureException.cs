@@ -25,9 +25,9 @@ using System;
 namespace BlinkDebitApiClient.Exceptions;
 
 /// <summary>
-/// The base checked exception for Blink Debit payments.
+/// The exception for Blink Debit payments.
 /// </summary>
-public class BlinkPaymentFailureException : Exception
+public class BlinkPaymentFailureException : BlinkServiceException
 {
     public BlinkPaymentFailureException() : this("Payment operation failed")
     {

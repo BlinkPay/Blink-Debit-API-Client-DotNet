@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -52,7 +53,7 @@ public class QuickPaymentResponse : IEquatable<QuickPaymentResponse>, IValidatab
     {
         QuickPaymentId = quickPaymentId;
         // to ensure "consent" is required (not null)
-        Consent = consent ?? throw new ArgumentNullException(
+        Consent = consent ?? throw new BlinkInvalidValueException(
             "consent is a required property for QuickPaymentResponse and cannot be null");
     }
 

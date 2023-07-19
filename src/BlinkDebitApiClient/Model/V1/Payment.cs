@@ -26,6 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -160,10 +161,10 @@ public class Payment : IEquatable<Payment>, IValidatableObject
         StatusUpdatedTimestamp = statusUpdatedTimestamp;
         // to ensure "detail" is required (not null)
         Detail = detail ??
-                 throw new ArgumentNullException("detail is a required property for Payment and cannot be null");
+                 throw new BlinkInvalidValueException("detail is a required property for Payment and cannot be null");
         // to ensure "refunds" is required (not null)
         Refunds = refunds ??
-                  throw new ArgumentNullException("refunds is a required property for Payment and cannot be null");
+                  throw new BlinkInvalidValueException("refunds is a required property for Payment and cannot be null");
         AcceptedReason = acceptedReason;
     }
 

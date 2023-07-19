@@ -137,7 +137,7 @@ public class BankMetadataApi : IBankMetadataApi
     /// <returns></returns>
     public BankMetadataApi(ILogger logger, string basePath)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
         Configuration = Config.Configuration.MergeConfigurations(
             GlobalConfiguration.Instance,
             new Configuration { BasePath = basePath }
@@ -156,8 +156,8 @@ public class BankMetadataApi : IBankMetadataApi
     /// <returns></returns>
     public BankMetadataApi(ILogger logger, Configuration configuration)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
+        if (configuration == null) throw new BlinkInvalidValueException(nameof(configuration) + " cannot be null");
 
         Configuration = Config.Configuration.MergeConfigurations(
             GlobalConfiguration.Instance,
@@ -179,10 +179,10 @@ public class BankMetadataApi : IBankMetadataApi
     public BankMetadataApi(ILogger logger, ISynchronousClient client, IAsynchronousClient asyncClient,
         IReadableConfiguration configuration)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        Client = client ?? throw new ArgumentNullException(nameof(client));
-        AsynchronousClient = asyncClient ?? throw new ArgumentNullException(nameof(asyncClient));
-        Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
+        Client = client ?? throw new BlinkInvalidValueException(nameof(client) + " cannot be null");
+        AsynchronousClient = asyncClient ?? throw new BlinkInvalidValueException(nameof(asyncClient) + " cannot be null");
+        Configuration = configuration ?? throw new BlinkInvalidValueException(nameof(configuration) + " cannot be null");
         ExceptionFactory = Config.Configuration.DefaultExceptionFactory;
     }
 
@@ -220,7 +220,7 @@ public class BankMetadataApi : IBankMetadataApi
         {
             if (_exceptionFactory != null && _exceptionFactory.GetInvocationList().Length > 1)
             {
-                throw new InvalidOperationException("Multicast delegate for ExceptionFactory is unsupported.");
+                throw new BlinkClientException("Multicast delegate for ExceptionFactory is unsupported.");
             }
 
             return _exceptionFactory;

@@ -26,6 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -76,7 +77,7 @@ public class Amount : IEquatable<Amount>, IValidatableObject
     {
         // to ensure "total" is required (not null)
         Total = total ??
-                throw new ArgumentNullException("total is a required property for Amount and cannot be null");
+                throw new BlinkInvalidValueException("total is a required property for Amount and cannot be null");
         Currency = currency;
     }
 

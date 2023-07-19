@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -53,10 +54,10 @@ public class PartialRefundRequestAllOf : IEquatable<PartialRefundRequestAllOf>, 
         string consentRedirect = default(string))
     {
         // to ensure "amount" is required (not null)
-        Amount = amount ?? throw new ArgumentNullException(
+        Amount = amount ?? throw new BlinkInvalidValueException(
             "amount is a required property for PartialRefundRequestAllOf and cannot be null");
         // to ensure "pcr" is required (not null)
-        Pcr = pcr ?? throw new ArgumentNullException(
+        Pcr = pcr ?? throw new BlinkInvalidValueException(
             "pcr is a required property for PartialRefundRequestAllOf and cannot be null");
         ConsentRedirect = consentRedirect;
     }

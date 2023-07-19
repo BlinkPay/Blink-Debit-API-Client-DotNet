@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using JsonSubTypes;
 using Newtonsoft.Json;
 
@@ -50,13 +51,13 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
     {
         // to ensure "flow" is required (not null)
         Flow = flow ??
-               throw new ArgumentNullException(
+               throw new BlinkInvalidValueException(
                    "flow is a required property for SingleConsentRequest and cannot be null");
         // to ensure "pcr" is required (not null)
         Pcr = pcr ??
-              throw new ArgumentNullException("pcr is a required property for SingleConsentRequest and cannot be null");
+              throw new BlinkInvalidValueException("pcr is a required property for SingleConsentRequest and cannot be null");
         // to ensure "amount" is required (not null)
-        Amount = amount ?? throw new ArgumentNullException(
+        Amount = amount ?? throw new BlinkInvalidValueException(
             "amount is a required property for SingleConsentRequest and cannot be null");
         Type = type;
     }

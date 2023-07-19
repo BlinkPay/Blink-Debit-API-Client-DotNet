@@ -20,35 +20,24 @@
  * SOFTWARE.
  */
 
-namespace BlinkDebitApiClient.Config;
+using System;
+
+namespace BlinkDebitApiClient.Exceptions;
 
 /// <summary>
-/// The Blink Pay properties for Blink Bills and Blink Debit (Blink AutoPay and Blink PayNow).
+/// The exception thrown when an API call failed but can be retried.
 /// </summary>
-public class BlinkPayProperties
+public class BlinkRetryableException : Exception
 {
-    /// <summary>
-    /// The Blink Debit hostname
-    /// </summary>
-    public string DebitUrl { get; set; } = "https://sandbox.debit.blinkpay.co.nz";
+    public BlinkRetryableException() : this("Operation failed and will be retried")
+    {
+    }
 
-    /// <summary>
-    /// The request timeout
-    /// </summary>
-    public int Timeout { get; set; } = 10000;
+    public BlinkRetryableException(string message) : base(message)
+    {
+    }
 
-    /// <summary>
-    /// The flag for retries
-    /// </summary>
-    public bool RetryEnabled { get; set; } = true;
-
-    /// <summary>
-    /// The OAuth2 client ID
-    /// </summary>
-    public string ClientId { get; set; }
-
-    /// <summary>
-    /// The OAuth2 client secret
-    /// </summary>
-    public string ClientSecret { get; set; }
+    public BlinkRetryableException(string message, Exception innerException) : base(message, innerException)
+    {
+    }
 }

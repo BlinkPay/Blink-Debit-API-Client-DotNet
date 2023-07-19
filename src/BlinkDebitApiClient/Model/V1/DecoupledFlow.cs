@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using JsonSubTypes;
 using Newtonsoft.Json;
 
@@ -73,7 +74,7 @@ public class DecoupledFlow : AuthFlowDetail, IEquatable<DecoupledFlow>, IValidat
         IdentifierType = identifierType;
         // to ensure "identifierValue" is required (not null)
         IdentifierValue = identifierValue ??
-                          throw new ArgumentNullException(
+                          throw new BlinkInvalidValueException(
                               "identifierValue is a required property for DecoupledFlow and cannot be null");
         CallbackUrl = callbackUrl;
         Type = type;

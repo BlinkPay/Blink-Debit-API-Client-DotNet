@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -57,7 +58,7 @@ public class RedirectFlowAllOf : IEquatable<RedirectFlowAllOf>, IValidatableObje
     public RedirectFlowAllOf(string redirectUri = default(string), Bank bank = default(Bank))
     {
         // to ensure "redirectUri" is required (not null)
-        RedirectUri = redirectUri ?? throw new ArgumentNullException(
+        RedirectUri = redirectUri ?? throw new BlinkInvalidValueException(
             "redirectUri is a required property for RedirectFlowAllOf and cannot be null");
         Bank = bank;
     }

@@ -90,7 +90,7 @@ public class Configuration : IReadableConfiguration
             case 408:
                 logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
                     SanitiseHeaders(response.Headers), body.Message);
-                throw new BlinkRequestTimeoutException(body.Message);
+                throw new BlinkRetryableException(body.Message);
             case 422:
                 logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
                     SanitiseHeaders(response.Headers), body.Message);
@@ -114,7 +114,7 @@ public class Configuration : IReadableConfiguration
             case >= 500:
                 logger.LogError("Status Code: {status}\nHeaders: {headers}\nBody: {body}", status,
                     SanitiseHeaders(response.Headers), body.Message);
-                throw new BlinkServiceException(body.Message);
+                throw new BlinkRetryableException(body.Message);
         }
 
         return null;
@@ -180,7 +180,7 @@ public class Configuration : IReadableConfiguration
     public Configuration()
     {
         Proxy = null;
-        UserAgent = WebUtility.UrlEncode("C#/Blink SDK 1.0");
+        UserAgent = WebUtility.UrlEncode(".NET/Blink SDK 1.0");
         BasePath = "https://sandbox.debit.blinkpay.co.nz/payments/v1";
         DefaultHeaders = new ConcurrentDictionary<string, string>();
         ApiKey = new ConcurrentDictionary<string, string>();
@@ -216,13 +216,13 @@ public class Configuration : IReadableConfiguration
         string basePath = "https://sandbox.debit.blinkpay.co.nz/payments/v1") : this()
     {
         if (string.IsNullOrWhiteSpace(basePath))
-            throw new ArgumentException("The provided basePath is invalid.", "basePath");
+            throw new BlinkInvalidValueException("The basePath cannot be null or empty");
         if (defaultHeaders == null)
-            throw new ArgumentNullException("defaultHeaders");
+            throw new BlinkInvalidValueException("The defaultHeaders cannot be null");
         if (apiKey == null)
-            throw new ArgumentNullException("apiKey");
+            throw new BlinkInvalidValueException("The apiKey cannot be null");
         if (apiKeyPrefix == null)
-            throw new ArgumentNullException("apiKeyPrefix");
+            throw new BlinkInvalidValueException("The apiKeyPrefix cannot be null");
 
         BasePath = basePath;
 
@@ -441,7 +441,7 @@ public class Configuration : IReadableConfiguration
         {
             if (value == null)
             {
-                throw new InvalidOperationException("ApiKeyPrefix collection may not be null.");
+                throw new BlinkClientException("ApiKeyPrefix collection may not be null.");
             }
 
             _apiKeyPrefix = value;
@@ -459,7 +459,7 @@ public class Configuration : IReadableConfiguration
         {
             if (value == null)
             {
-                throw new InvalidOperationException("ApiKey collection may not be null.");
+                throw new BlinkClientException("ApiKey collection may not be null.");
             }
 
             _apiKey = value;
@@ -477,7 +477,7 @@ public class Configuration : IReadableConfiguration
         {
             if (value == null)
             {
-                throw new InvalidOperationException("Servers may not be null.");
+                throw new BlinkClientException("Servers may not be null.");
             }
 
             _servers = value;
@@ -495,7 +495,7 @@ public class Configuration : IReadableConfiguration
         {
             if (value == null)
             {
-                throw new InvalidOperationException("Operation servers may not be null.");
+                throw new BlinkClientException("Operation servers may not be null.");
             }
 
             _operationServers = value;
@@ -567,7 +567,7 @@ public class Configuration : IReadableConfiguration
     {
         if (index < 0 || index >= servers.Count)
         {
-            throw new InvalidOperationException(
+            throw new BlinkClientException(
                 $"Invalid index {index} when selecting the server. Must be less than {servers.Count}.");
         }
 
@@ -594,7 +594,7 @@ public class Configuration : IReadableConfiguration
                     }
                     else
                     {
-                        throw new InvalidOperationException(
+                        throw new BlinkClientException(
                             $"The variable `{variable.Key}` in the server URL has invalid value #{inputVariables[variable.Key]}. Must be {(List<string>)serverVariables["enum_values"]}");
                     }
                 }
@@ -618,11 +618,9 @@ public class Configuration : IReadableConfiguration
     /// </summary>
     public static string ToDebugReport()
     {
-        var report = "C# SDK (BlinkDebitApiClient) Debug Report:\n";
+        var report = ".NET SDK (BlinkDebitApiClient) Debug Report:\n";
         report += "    OS: " + Environment.OSVersion + "\n";
         report += "    .NET Framework Version: " + Environment.Version + "\n";
-        report += "    Version of the API: 1.0.19\n";
-        report += "    SDK Package Version: 1.0.0\n";
 
         return report;
     }

@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -65,7 +66,7 @@ public class DecoupledFlowHint : FlowHint, IEquatable<DecoupledFlowHint>, IValid
         Bank = bank;
         IdentifierType = identifierType;
         // to ensure "identifierValue" is required (not null)
-        IdentifierValue = identifierValue ?? throw new ArgumentNullException(
+        IdentifierValue = identifierValue ?? throw new BlinkInvalidValueException(
             "identifierValue is a required property for DecoupledFlowHint and cannot be null");
     }
 

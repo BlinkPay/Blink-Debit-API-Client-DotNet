@@ -26,6 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -57,7 +58,7 @@ public class BankMetadataFeaturesDecoupledFlow : IEquatable<BankMetadataFeatures
     {
         Enabled = enabled;
         // to ensure "requestTimeout" is required (not null)
-        RequestTimeout = requestTimeout ?? throw new ArgumentNullException(
+        RequestTimeout = requestTimeout ?? throw new BlinkInvalidValueException(
             "requestTimeout is a required property for BankMetadataFeaturesDecoupledFlow and cannot be null");
         AvailableIdentifiers = availableIdentifiers;
     }

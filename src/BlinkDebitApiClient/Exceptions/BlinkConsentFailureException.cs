@@ -25,9 +25,9 @@ using System;
 namespace BlinkDebitApiClient.Exceptions;
 
 /// <summary>
-/// The base checked exception for Blink Debit consents.
+/// The exception for Blink Debit consents.
 /// </summary>
-public class BlinkConsentFailureException : Exception
+public class BlinkConsentFailureException : BlinkServiceException
 {
     public BlinkConsentFailureException() : this("Consent operation failed")
     {

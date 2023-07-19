@@ -27,6 +27,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -83,7 +84,7 @@ public class ConsentDetail : AbstractOpenAPISchema, IEquatable<ConsentDetail>, I
     {
         IsNullable = false;
         SchemaType = "oneOf";
-        ActualInstance = actualInstance ?? throw new ArgumentException("Invalid instance found. Must not be null.");
+        ActualInstance = actualInstance ?? throw new BlinkInvalidValueException("Invalid instance found. Must not be null.");
     }
 
     /// <summary>
@@ -95,7 +96,7 @@ public class ConsentDetail : AbstractOpenAPISchema, IEquatable<ConsentDetail>, I
     {
         IsNullable = false;
         SchemaType = "oneOf";
-        ActualInstance = actualInstance ?? throw new ArgumentException("Invalid instance found. Must not be null.");
+        ActualInstance = actualInstance ?? throw new BlinkInvalidValueException("Invalid instance found. Must not be null.");
     }
 
 
@@ -119,7 +120,7 @@ public class ConsentDetail : AbstractOpenAPISchema, IEquatable<ConsentDetail>, I
             }
             else
             {
-                throw new ArgumentException(
+                throw new BlinkInvalidValueException(
                     "Invalid instance found. Must be the following types: EnduringConsentRequest, SingleConsentRequest");
             }
         }

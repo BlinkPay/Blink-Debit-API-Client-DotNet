@@ -42,7 +42,6 @@ public class OAuthAuthenticator : AuthenticatorBase
     private readonly string _grantType;
     private readonly JsonSerializerSettings _serializerSettings;
     private readonly IReadableConfiguration _configuration;
-    private static readonly TimeZoneInfo NzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
 
     /// <summary>
     /// Initialize the OAuth2 Authenticator
@@ -78,8 +77,8 @@ public class OAuthAuthenticator : AuthenticatorBase
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(Token.Replace(BlinkDebitConstant.BEARER.GetValue(), string.Empty));
-            var expiry = TimeZoneInfo.ConvertTime(token.ValidTo, NzTimeZone);
-            var now = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, NzTimeZone);
+            var expiry = token.ValidTo;
+            var now = DateTimeOffset.UtcNow;
             if (expiry > now)
             {
                 Token = string.IsNullOrEmpty(Token) ? await GetToken().ConfigureAwait(false) : Token;

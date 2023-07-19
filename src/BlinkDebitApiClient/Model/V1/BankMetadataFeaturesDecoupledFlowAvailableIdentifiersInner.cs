@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -62,7 +63,7 @@ public class BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner :
     {
         Type = type;
         // to ensure "name" is required (not null)
-        Name = name ?? throw new ArgumentNullException(
+        Name = name ?? throw new BlinkInvalidValueException(
             "name is a required property for BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner and cannot be null");
         Regex = regex;
         Description = description;

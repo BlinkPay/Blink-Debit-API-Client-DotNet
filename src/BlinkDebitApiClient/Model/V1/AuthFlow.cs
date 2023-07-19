@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -51,7 +52,7 @@ public class AuthFlow : IEquatable<AuthFlow>, IValidatableObject
     {
         // to ensure "detail" is required (not null)
         Detail = detail ??
-                 throw new ArgumentNullException("detail is a required property for AuthFlow and cannot be null");
+                 throw new BlinkInvalidValueException("detail is a required property for AuthFlow and cannot be null");
     }
 
     /// <summary>

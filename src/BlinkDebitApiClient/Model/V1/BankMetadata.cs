@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -61,11 +62,11 @@ public class BankMetadata : IEquatable<BankMetadata>, IValidatableObject
         Name = name;
         // to ensure "features" is required (not null)
         Features = features ??
-                   throw new ArgumentNullException(
+                   throw new BlinkInvalidValueException(
                        "features is a required property for BankMetadata and cannot be null");
         // to ensure "redirectFlow" is required (not null)
         RedirectFlow = redirectFlow ??
-                       throw new ArgumentNullException(
+                       throw new BlinkInvalidValueException(
                            "redirectFlow is a required property for BankMetadata and cannot be null");
     }
 

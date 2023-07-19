@@ -26,6 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -117,10 +118,10 @@ public class Consent : IEquatable<Consent>, IValidatableObject
         StatusUpdatedTimestamp = statusUpdatedTimestamp;
         // to ensure "detail" is required (not null)
         Detail = detail ??
-                 throw new ArgumentNullException("detail is a required property for Consent and cannot be null");
+                 throw new BlinkInvalidValueException("detail is a required property for Consent and cannot be null");
         // to ensure "payments" is required (not null)
         Payments = payments ??
-                   throw new ArgumentNullException(
+                   throw new BlinkInvalidValueException(
                        "payments is a required property for Consent and cannot be null");
     }
 

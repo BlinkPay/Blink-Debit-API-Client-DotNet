@@ -31,7 +31,6 @@ using BlinkDebitApiClient.Client.Auth;
 using BlinkDebitApiClient.Config;
 using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Polly;
 using RestSharp;
@@ -71,7 +70,7 @@ public class BlinkDebitClient
         EnduringConsentsApi enduringConsentsApi, QuickPaymentsApi quickPaymentsApi, PaymentsApi paymentsApi,
         RefundsApi refundsApi, BankMetadataApi bankMetadataApi)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
         
         _singleConsentsApi = singleConsentsApi;
         _enduringConsentsApi = enduringConsentsApi;
@@ -79,14 +78,6 @@ public class BlinkDebitClient
         _paymentsApi = paymentsApi;
         _refundsApi = refundsApi;
         _bankMetadataApi = bankMetadataApi;
-    }
-
-    /// <summary>
-    /// Constructor with ILogger
-    /// </summary>
-    /// <param name="logger">The logger</param>
-    public BlinkDebitClient(ILogger logger) : this(logger, GenerateBlinkPayProperties())
-    {
     }
 
     /// <summary>
@@ -98,10 +89,12 @@ public class BlinkDebitClient
         Environment.GetEnvironmentVariable("BLINKPAY_DEBIT_URL") ?? blinkPayProperties.DebitUrl,
         Environment.GetEnvironmentVariable("BLINKPAY_CLIENT_ID") ?? blinkPayProperties.ClientId,
         Environment.GetEnvironmentVariable("BLINKPAY_CLIENT_SECRET") ?? blinkPayProperties.ClientSecret,
+        int.TryParse(Environment.GetEnvironmentVariable("BLINKPAY_TIMEOUT"), out var timeout)
+            ? timeout
+            : blinkPayProperties.Timeout,
         bool.TryParse(Environment.GetEnvironmentVariable("BLINKPAY_RETRY_ENABLED"), out var retryEnabled)
             ? retryEnabled
-            : blinkPayProperties.RetryEnabled
-    )
+            : blinkPayProperties.RetryEnabled)
     {
     }
 
@@ -112,16 +105,26 @@ public class BlinkDebitClient
     /// <param name="debitUrl">The Blink Debit URL</param>
     /// <param name="clientId">The OAuth2 client ID</param>
     /// <param name="clientSecret">The OAuth2 client secret</param>
+    /// <param name="timeout">The request timeout in milliseconds</param>
     /// <param name="retryEnabled">The flag if retry is enabled</param>
-    public BlinkDebitClient(ILogger logger, string debitUrl, string clientId, string clientSecret,
+    public BlinkDebitClient(ILogger logger, string debitUrl, string clientId, string clientSecret, int? timeout,
         bool? retryEnabled = true)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
+        if (string.IsNullOrWhiteSpace(debitUrl)) {
+            throw new BlinkInvalidValueException("Blink Debit URL is not configured");
+        }
+        if (string.IsNullOrWhiteSpace(clientId)) {
+            throw new BlinkInvalidValueException("Blink Debit client ID is not configured");
+        }
+        if (string.IsNullOrWhiteSpace(clientSecret)) {
+            throw new BlinkInvalidValueException("Blink Debit client secret is not configured");
+        }
 
         var initialConfiguration = new Configuration
         {
             BasePath = debitUrl + "/payments/v1",
-            Timeout = 10000,
+            Timeout = timeout ?? 10000,
             OAuthTokenUrl = debitUrl + "/oauth2/token",
             OAuthClientId = clientId,
             OAuthClientSecret = clientSecret,
@@ -150,7 +153,7 @@ public class BlinkDebitClient
     /// <param name="configuration">The configuration</param>
     public BlinkDebitClient(ILogger logger, ApiClient apiClient, IReadableConfiguration configuration)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");
 
         _bankMetadataApi = new BankMetadataApi(logger, apiClient, apiClient, configuration);
         _singleConsentsApi = new SingleConsentsApi(logger, apiClient, apiClient, configuration);
@@ -158,18 +161,6 @@ public class BlinkDebitClient
         _quickPaymentsApi = new QuickPaymentsApi(logger, apiClient, apiClient, configuration);
         _paymentsApi = new PaymentsApi(logger, apiClient, apiClient, configuration);
         _refundsApi = new RefundsApi(logger, apiClient, apiClient, configuration);
-    }
-
-    private static BlinkPayProperties GenerateBlinkPayProperties()
-    {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json");
-        var config = builder.Build();
-        var blinkPayProperties = new BlinkPayProperties();
-        config.GetSection("BlinkPay").Bind(blinkPayProperties);
-
-        return blinkPayProperties;
     }
 
     private static void ConfigureRetry(bool retryEnabled)
@@ -182,8 +173,7 @@ public class BlinkDebitClient
         var random = new Random();
 
         var policyBuilder = Policy<RestResponse>
-            .Handle<BlinkRequestTimeoutException>()
-            .Or<BlinkServiceException>()
+            .Handle<BlinkRetryableException>()
             .Or<SocketException>()
             .Or<WebException>()
             .Or<HttpRequestException>();
@@ -362,7 +352,7 @@ public class BlinkDebitClient
                     return consent;
                 }
 
-                throw new BlinkConsentFailureException();
+                throw new BlinkRetryableException();
             }).Result;
         }
         catch (BlinkConsentTimeoutException)
@@ -476,7 +466,7 @@ public class BlinkDebitClient
                     case Consent.StatusEnum.GatewayAwaitingSubmission:
                     case Consent.StatusEnum.AwaitingAuthorisation:
                     default:
-                        throw new BlinkConsentFailureException(
+                        throw new BlinkRetryableException(
                             $"Single consent [{consentId}] is waiting for authorisation");
                 }
             });
@@ -510,7 +500,7 @@ public class BlinkDebitClient
     /// <param name="consentId">The consent ID</param>
     /// <param name="requestId">An optional request ID. If provided, it overrides the interaction ID generated by Blink Debit. (optional)</param>
     /// <param name="xCorrelationId">An optional correlation ID for logging chain of events. If provided, it overrides the correlation ID generated by Blink Debit. (optional)</param>
-    /// <returns>Task of void</returns>
+    /// <returns>void</returns>
     /// <exception cref="BlinkServiceException">Thrown when an exception occurs</exception>
     public void RevokeSingleConsent(Guid consentId, Guid? requestId = default(Guid?),
         Guid? xCorrelationId = default(Guid?))
@@ -673,7 +663,7 @@ public class BlinkDebitClient
                     return consent;
                 }
 
-                throw new BlinkConsentFailureException();
+                throw new BlinkRetryableException();
             }).Result;
         }
         catch (BlinkConsentTimeoutException)
@@ -804,7 +794,7 @@ public class BlinkDebitClient
                     case Consent.StatusEnum.GatewayAwaitingSubmission:
                     case Consent.StatusEnum.AwaitingAuthorisation:
                     default:
-                        throw new BlinkConsentFailureException(
+                        throw new BlinkRetryableException(
                             $"Enduring consent [{consentId}] is waiting for authorisation");
                 }
             });
@@ -1001,7 +991,7 @@ public class BlinkDebitClient
                     return quickPayment;
                 }
 
-                throw new BlinkConsentFailureException();
+                throw new BlinkRetryableException();
             }).Result;
         }
         catch (BlinkConsentTimeoutException)
@@ -1133,7 +1123,7 @@ public class BlinkDebitClient
                     case Consent.StatusEnum.GatewayAwaitingSubmission:
                     case Consent.StatusEnum.AwaitingAuthorisation:
                     default:
-                        throw new BlinkConsentFailureException(
+                        throw new BlinkRetryableException(
                             $"Quick payment [{quickPaymentId}] is waiting for authorisation");
                 }
             });
@@ -1340,7 +1330,7 @@ public class BlinkDebitClient
                 var payment = await GetPaymentAsync(paymentId);
 
                 var status = payment.Status;
-                _logger.LogDebug("The last status polled was: {status} \tfor Quick Payment ID: {consentId}", status,
+                _logger.LogDebug("The last status polled was: {status} \tfor Payment ID: {consentId}", status,
                     paymentId);
 
                 if (Payment.StatusEnum.AcceptedSettlementCompleted == status)
@@ -1348,7 +1338,7 @@ public class BlinkDebitClient
                     return payment;
                 }
 
-                throw new BlinkPaymentFailureException();
+                throw new BlinkRetryableException();
             }).Result;
         }
         catch (BlinkPaymentTimeoutException)
@@ -1421,9 +1411,9 @@ public class BlinkDebitClient
     /// <param name="paymentId">The payment ID</param>
     /// <param name="maxWaitSeconds">The number of seconds to wait</param>
     /// <returns>Task of Payment</returns>
-    /// <exception cref="BlinkConsentRejectedException"></exception>
-    /// <exception cref="BlinkConsentTimeoutException"></exception>
-    /// <exception cref="BlinkConsentFailureException"></exception>
+    /// <exception cref="BlinkConsentRejectedException">Thrown when a consent has been rejected by the customer</exception>
+    /// <exception cref="BlinkConsentTimeoutException">Thrown when a consent was not completed within the bank's request timeout window</exception>
+    /// <exception cref="BlinkConsentFailureException">Thrown when a consent exception occurs</exception>
     public async Task<Payment> AwaitSuccessfulPaymentAsync(Guid paymentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<Payment>
@@ -1457,7 +1447,7 @@ public class BlinkDebitClient
                     case Payment.StatusEnum.AcceptedSettlementInProcess:
                     case Payment.StatusEnum.Pending:
                     default:
-                        throw new BlinkPaymentFailureException($"Payment [{paymentId}] is pending or being processed");
+                        throw new BlinkRetryableException($"Payment [{paymentId}] is pending or being processed");
                 }
             });
         }

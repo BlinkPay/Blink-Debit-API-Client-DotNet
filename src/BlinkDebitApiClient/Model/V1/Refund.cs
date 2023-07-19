@@ -26,6 +26,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -95,11 +96,11 @@ public class Refund : IEquatable<Refund>, IValidatableObject
         StatusUpdatedTimestamp = statusUpdatedTimestamp;
         // to ensure "accountNumber" is required (not null)
         AccountNumber = accountNumber ??
-                        throw new ArgumentNullException(
+                        throw new BlinkInvalidValueException(
                             "accountNumber is a required property for Refund and cannot be null");
         // to ensure "detail" is required (not null)
         Detail = detail ??
-                 throw new ArgumentNullException("detail is a required property for Refund and cannot be null");
+                 throw new BlinkInvalidValueException("detail is a required property for Refund and cannot be null");
     }
 
     /// <summary>
