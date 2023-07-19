@@ -3,12 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/BlinkDebitApiClient)](https://www.nuget.org/packages/BlinkDebitApiClient)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=bugs)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=blink-debit-api-client-dotnet&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=blink-debit-api-client-dotnet)
-[![Known Vulnerabilities](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-DotNet/badge.svg)](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-DotNet)
+[![Snyk security](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-DotNet/badge.svg)](https://snyk.io/test/github/BlinkPay/Blink-Debit-API-Client-DotNet)
 
 # Table of Contents
 1. [Introduction](#introduction)
@@ -143,14 +138,6 @@ The client code can use .NET dependency injection.
 // configure dependency injection
 var serviceCollection = new ServiceCollection();
 
-// configure logger
-serviceCollection.AddLogging(builder =>
-{
-    builder
-        .AddConsole() // use file logging
-        .AddDebug(); // use information
-});
-
 // configure path to appsettings.json
 var basePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..");
 var config = new ConfigurationBuilder()
@@ -159,16 +146,23 @@ var config = new ConfigurationBuilder()
     .Build();
 // configure BlinkPayProperties
 serviceCollection.Configure<BlinkPayProperties>(config.GetSection("BlinkPay"));
+serviceCollection.AddSingleton(resolver => resolver.GetRequiredService<IOptions<BlinkPayProperties>>().Value);
+
+// configure logger
+serviceCollection.AddLogging(builder =>
+{
+    builder
+        .AddConsole() // use file logging
+        .AddDebug(); // use information
+});
+var serviceProvider = serviceCollection.BuildServiceProvider();
+var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+var logger = loggerFactory.CreateLogger("BlinkDebitClient");
+serviceCollection.AddSingleton(logger);
 
 // create BlinkDebitClient
-serviceCollection.AddSingleton<BlinkDebitClient>(serviceProvider =>
-{
-    return new BlinkDebitClient(serviceProvider.GetRequiredService<ILogger<RefundsApi>>(),
-        serviceProvider.GetRequiredService<IOptions<BlinkPayProperties>>().Value);
-});
-
-// build service provider
-var serviceProvider = serviceCollection.BuildServiceProvider();
+serviceCollection.AddSingleton<BlinkDebitClient>();
+serviceProvider = serviceCollection.BuildServiceProvider();
 
 // retrieve BlinkDebitClient
 var client = serviceProvider.GetService<BlinkDebitClient>();
