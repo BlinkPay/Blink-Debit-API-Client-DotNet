@@ -52,7 +52,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
-          SNYK_PROJECT_NAME: blink-debit-api-client-csharp-dotnet
+          SNYK_PROJECT_NAME: blink-debit-api-client-dotnet
           WORKING_DIRECTORY: ./src/BlinkDebitApiClient
         continue-on-error: true
 
@@ -69,9 +69,9 @@ jobs:
         run: dotnet tool install --global dotnet-sonarscanner
       - name: Restore NuGet packages
         run: dotnet restore
-      - name: Run Sonar on blink-debit-api-client-csharp-dotnet to inspect code
+      - name: Run Sonar on blink-debit-api-client-dotnet to inspect code
         run: |
-          dotnet sonarscanner begin /k:"blink-debit-api-client-csharp-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.branch.name="${{ github.ref }}"
+          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.branch.name="${{ github.ref }}"
           dotnet build --configuration Release --no-restore /p:WarningLevel=0
           dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         continue-on-error: true

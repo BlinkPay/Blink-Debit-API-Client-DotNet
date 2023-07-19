@@ -327,7 +327,7 @@ public class BlinkDebitClient
     public Consent AwaitAuthorisedSingleConsent(Guid consentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<Consent>
-            .Handle<BlinkConsentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {
@@ -431,7 +431,7 @@ public class BlinkDebitClient
     public async Task<Consent> AwaitAuthorisedSingleConsentAsync(Guid consentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<Consent>
-            .Handle<BlinkConsentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {
@@ -621,7 +621,7 @@ public class BlinkDebitClient
     public Consent AwaitAuthorisedEnduringConsent(Guid consentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<Consent>
-            .Handle<BlinkConsentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {
@@ -742,7 +742,7 @@ public class BlinkDebitClient
     public async Task<Consent> AwaitAuthorisedEnduringConsentAsync(Guid consentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<Consent>
-            .Handle<BlinkConsentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {
@@ -949,7 +949,7 @@ public class BlinkDebitClient
     public QuickPaymentResponse AwaitSuccessfulQuickPayment(Guid quickPaymentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<QuickPaymentResponse>
-            .Handle<BlinkConsentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {
@@ -1070,7 +1070,7 @@ public class BlinkDebitClient
     public async Task<QuickPaymentResponse> AwaitSuccessfulQuickPaymentAsync(Guid quickPaymentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<QuickPaymentResponse>
-            .Handle<BlinkConsentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {
@@ -1313,7 +1313,7 @@ public class BlinkDebitClient
     public Payment AwaitSuccessfulPayment(Guid paymentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<Payment>
-            .Handle<BlinkPaymentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {
@@ -1417,7 +1417,7 @@ public class BlinkDebitClient
     public async Task<Payment> AwaitSuccessfulPaymentAsync(Guid paymentId, int maxWaitSeconds)
     {
         var retryPolicy = Policy<Payment>
-            .Handle<BlinkPaymentFailureException>()
+            .Handle<BlinkRetryableException>()
             .WaitAndRetryAsync(maxWaitSeconds, retryAttempt => TimeSpan.FromSeconds(1),
                 (exception, timeSpan, retryCount, context) =>
                 {

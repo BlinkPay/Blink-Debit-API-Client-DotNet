@@ -111,7 +111,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Consent timed out", e.Message);
         }
     }
@@ -130,7 +130,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Consent with ID [" + consentId + "] does not exist", e.Message);
         }
     }
@@ -219,7 +219,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Consent timed out", e.Message);
         }
     }
@@ -238,7 +238,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Consent with ID [" + consentId + "] does not exist", e.Message);
         }
     }
@@ -319,7 +319,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Consent timed out", e.Message);
         }
     }
@@ -338,7 +338,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Consent with ID [" + consentId + "] does not exist", e.Message);
         }
     }
@@ -424,7 +424,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Consent timed out", e.Message);
         }
     }
@@ -443,7 +443,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Consent with ID [" + consentId + "] does not exist", e.Message);
         }
     }
@@ -538,7 +538,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Consent timed out", e.Message);
         }
     }
@@ -557,7 +557,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Consent with ID [" + consentId + "] does not exist", e.Message);
         }
     }
@@ -664,7 +664,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Consent timed out", e.Message);
         }
     }
@@ -683,7 +683,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Consent with ID [" + consentId + "] does not exist", e.Message);
         }
     }
@@ -815,7 +815,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Payment timed out", e.Message);
         }
     }
@@ -834,7 +834,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Payment with ID [" + paymentId + "] does not exist", e.Message);
         }
     }
@@ -976,7 +976,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkConsentTimeoutException>(e);
             Assert.Equal("Payment timed out", e.Message);
         }
     }
@@ -995,7 +995,7 @@ public class BlinkDebitClientTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkServiceException>(e);
+            Assert.IsType<BlinkResourceNotFoundException>(e);
             Assert.Equal("Payment with ID [" + paymentId + "] does not exist", e.Message);
         }
     }
