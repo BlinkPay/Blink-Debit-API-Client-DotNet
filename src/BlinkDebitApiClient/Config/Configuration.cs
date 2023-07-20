@@ -47,12 +47,6 @@ public class Configuration : IReadableConfiguration
     #region Constants
 
     /// <summary>
-    /// Version of the package.
-    /// </summary>
-    /// <value>Version of the package.</value>
-    public const string Version = "1.0.0";
-
-    /// <summary>
     /// Identifier for ISO 8601 DateTime Format
     /// </summary>
     /// <remarks>See https://msdn.microsoft.com/en-us/library/az4se3k1(v=vs.110).aspx#Anchor_8 for more information.</remarks>
