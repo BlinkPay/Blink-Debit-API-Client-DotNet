@@ -1,43 +1,54 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
     <TargetFramework>net7.0</TargetFramework>
     <AssemblyName>BlinkDebitApiClient</AssemblyName>
     <PackageId>BlinkDebitApiClient</PackageId>
     <OutputType>Library</OutputType>
-    <Authors>OpenAPI</Authors>
-    <Company>OpenAPI</Company>
-    <AssemblyTitle>OpenAPI Library</AssemblyTitle>
-    <Description>A library generated from a OpenAPI doc</Description>
-    <Copyright>No Copyright</Copyright>
+    <Authors>Rey Vincent Babilonia (rey.babilonia@blinkpay.co.nz)</Authors>
+    <Company>BlinkPay</Company>
+    <AssemblyTitle>Blink Debit API Client for .NET 7</AssemblyTitle>
+    <Description>Blink Debit API Client for .NET 7</Description>
+    <Copyright>Copyright (c) 2023 BlinkPay</Copyright>
     <RootNamespace>BlinkDebitApiClient</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.0.0-SNAPSHOT</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\BlinkDebitApiClient.xml</DocumentationFile>
-    <RepositoryUrl>https:////.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-DotNet.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Nullable>annotations</Nullable>
+    <PackageProjectUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-DotNet</PackageProjectUrl>
+    <PackageIcon>bp.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="JsonSubTypes" Version="2.0.1" />
-    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RestSharp" Version="108.0.3" />
+    <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
+    <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="System.Web" />
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\images\bp.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+      <Link>bp.png</Link>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Web" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Config\" />
-    <Folder Include="Enums\" />
-    <Folder Include="Exception\" />
-    <Folder Include="Helpers\" />
   </ItemGroup>
 </Project>
