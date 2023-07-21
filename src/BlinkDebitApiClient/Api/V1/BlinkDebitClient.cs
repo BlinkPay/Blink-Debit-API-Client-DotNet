@@ -81,7 +81,17 @@ public class BlinkDebitClient
     }
 
     /// <summary>
-    /// Constructor with ILogger and BlinkPayProperties
+    /// Constructor with ILogger. It will pick up the environment variables from the environment or launchSettings.json.
+    /// </summary>
+    /// <param name="logger">The logger</param>
+    public BlinkDebitClient(ILogger logger) : this(logger, Environment.GetEnvironmentVariable("BLINKPAY_DEBIT_URL"),
+        Environment.GetEnvironmentVariable("BLINKPAY_CLIENT_ID"),
+        Environment.GetEnvironmentVariable("BLINKPAY_CLIENT_SECRET"))
+    {
+    }
+
+    /// <summary>
+    /// Constructor with ILogger and BlinkPayProperties from appsettings.json.
     /// </summary>
     /// <param name="logger">The logger</param>
     /// <param name="blinkPayProperties">The BlinkPayProperties</param>
@@ -99,7 +109,7 @@ public class BlinkDebitClient
     }
 
     /// <summary>
-    /// The constructor with the essential parameters
+    /// The constructor with the essential parameters.
     /// </summary>
     /// <param name="logger">The logger</param>
     /// <param name="debitUrl">The Blink Debit URL</param>
@@ -107,7 +117,7 @@ public class BlinkDebitClient
     /// <param name="clientSecret">The OAuth2 client secret</param>
     /// <param name="timeout">The request timeout in milliseconds</param>
     /// <param name="retryEnabled">The flag if retry is enabled</param>
-    public BlinkDebitClient(ILogger logger, string debitUrl, string clientId, string clientSecret, int? timeout,
+    public BlinkDebitClient(ILogger logger, string debitUrl, string clientId, string clientSecret, int? timeout = 10000,
         bool? retryEnabled = true)
     {
         _logger = logger ?? throw new BlinkInvalidValueException(nameof(logger) + " cannot be null");

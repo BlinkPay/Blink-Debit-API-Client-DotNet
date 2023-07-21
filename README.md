@@ -226,7 +226,7 @@ var pcr = new Pcr("particulars");
 var amount = new Amount("0.01", Amount.CurrencyEnum.NZD);
 var request = new SingleConsentRequest(authFlow, pcr, amount);
 
-var createConsentResponse = client.CreateSingleConsent(consent);
+var createConsentResponse = client.CreateSingleConsent(request);
 var redirectUri = createConsentResponse.RedirectUri; // Redirect the consumer to this URL
 var paymentRequest = new PaymentRequest
 {
