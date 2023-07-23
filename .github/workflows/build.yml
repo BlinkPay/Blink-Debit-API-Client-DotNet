@@ -12,9 +12,9 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
 
@@ -22,7 +22,7 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
@@ -41,7 +41,7 @@ jobs:
     needs: cache
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Restore NuGet packages
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
@@ -60,9 +60,9 @@ jobs:
     needs: snyk
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
       - name: Install SonarScanner
@@ -71,7 +71,7 @@ jobs:
         run: dotnet restore
       - name: Run Sonar on blink-debit-api-client-dotnet to inspect code
         run: |
-          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.branch.name="${{ github.ref }}"
+          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.branch.name="master"
           dotnet build --configuration Release --no-restore /p:WarningLevel=0
           dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         continue-on-error: true
@@ -80,7 +80,7 @@ jobs:
     needs: sonar
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
@@ -96,17 +96,17 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
-      - name: Restore dependencies
-        run: dotnet restore
       - name: Pack
-        run: dotnet pack --configuration Release --no-build --version-suffix ${{ github.event.release.tag_name }}
+        run: |
+          dotnet restore
+          dotnet pack --configuration Release --no-build --version-suffix ${{ github.event.release.tag_name }}
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
           source-url: https://api.nuget.org/v3/index.json
