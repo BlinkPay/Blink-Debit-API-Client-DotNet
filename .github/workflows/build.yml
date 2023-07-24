@@ -51,7 +51,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
           SNYK_PROJECT_NAME: blink-debit-api-client-dotnet
-          WORKING_DIRECTORY: ./src/BlinkDebitApiClient/BlinkDebitApiClient.csproj
+          WORKING_DIRECTORY: ./src/BlinkDebitApiClient
         continue-on-error: true
 
   sonar:
