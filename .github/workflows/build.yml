@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Restore NuGet packages
-        run: dotnet restore ./BlinkDebitApiClient.sln
+        run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/dotnet@0.4.0
         with:
@@ -51,6 +51,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
           SNYK_PROJECT_NAME: blink-debit-api-client-dotnet
+          WORKING_DIRECTORY: ./src/BlinkDebitApiClient
         continue-on-error: true
 
   sonar:
