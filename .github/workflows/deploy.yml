@@ -22,5 +22,6 @@ jobs:
           dotnet pack --configuration Release /p:PackageVersion=${{ github.event.release.tag_name }}
       - name: Push
         env:
-          NUGET_API_KEY: ${{secrets.NUGET_API_KEY}}
+          NUGET_API_KEY: ${{ secrets.NUGET_TOKEN }}
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
         run: dotnet nuget push "**/*.nupkg"
