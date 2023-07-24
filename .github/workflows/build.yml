@@ -1,12 +1,11 @@
-name: .NET CI/CD
+name: Build
 
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  release:
-    types: [ published ]
+  workflow_dispatch:
 
 jobs:
   setup:
@@ -90,27 +89,3 @@ jobs:
         env:
           BLINKPAY_CLIENT_ID: ${{ vars.CLIENT_ID }}
           BLINKPAY_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-
-  nuget_push:
-    needs: restore_build_test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.x'
-      - name: Pack
-        run: |
-          dotnet restore
-          dotnet pack --configuration Release --no-build --version-suffix ${{ github.event.release.tag_name }}
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.x'
-          source-url: https://api.nuget.org/v3/index.json
-      - name: Push
-        env:
-          NUGET_API_KEY: ${{secrets.NUGET_API_KEY}}
-        run: dotnet nuget push "**/*.nupkg"
