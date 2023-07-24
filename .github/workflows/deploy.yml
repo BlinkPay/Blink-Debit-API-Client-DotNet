@@ -8,7 +8,7 @@ on:
 jobs:
   nuget_push:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.event.release.target_commitish == 'master'
     steps:
       - uses: actions/checkout@v3
       - name: Setup .NET
