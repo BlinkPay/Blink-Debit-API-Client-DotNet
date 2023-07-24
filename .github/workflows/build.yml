@@ -21,6 +21,7 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Cache SonarCloud packages
         uses: actions/cache@v1
         with:
@@ -39,6 +40,7 @@ jobs:
     needs: cache
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Restore NuGet packages
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
@@ -57,6 +59,7 @@ jobs:
     needs: snyk
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Install SonarScanner
         run: dotnet tool install --global dotnet-sonarscanner
       - name: Restore NuGet packages
@@ -72,6 +75,7 @@ jobs:
     needs: sonar
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
