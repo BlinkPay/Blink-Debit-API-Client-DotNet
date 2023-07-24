@@ -44,15 +44,14 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/dotnet@0.3.0
+        uses: snyk/actions/dotnet@0.4.0
         with:
           command: monitor
-          args: --all-projects
+          args: --all-projects --exclude=BlinkDebitApiClient.Test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
           SNYK_PROJECT_NAME: blink-debit-api-client-dotnet
-          WORKING_DIRECTORY: ./src/BlinkDebitApiClient
         continue-on-error: true
 
   sonar:
@@ -66,7 +65,7 @@ jobs:
         run: dotnet restore
       - name: Run Sonar on blink-debit-api-client-dotnet to inspect code
         run: |
-          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.branch.name="${{ github.ref }}"
+          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           dotnet build --configuration Release --no-restore /p:WarningLevel=0
           dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         continue-on-error: true
