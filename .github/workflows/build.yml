@@ -47,7 +47,7 @@ jobs:
         uses: snyk/actions/dotnet@0.4.0
         with:
           command: monitor
-          args: --exclude=./src/BlinkDebitApiClient.Test
+          args: --all-projects --exclude=BlinkDebitApiClient.Test
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           SNYK_ORG: blinkpay-zw9
