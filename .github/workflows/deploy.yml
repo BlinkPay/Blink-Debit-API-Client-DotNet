@@ -23,6 +23,6 @@ jobs:
           dotnet restore
           dotnet pack --configuration Release /p:PackageVersion=${{ github.event.release.tag_name }}
       - name: Push
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_TOKEN }}
-        run: dotnet nuget push "**/*.nupkg"
+        run: |
+          echo "NUGET_API_KEY=${{ secrets.NUGET_TOKEN }}" >> $GITHUB_ENV
+          dotnet nuget push "**/*.nupkg"
