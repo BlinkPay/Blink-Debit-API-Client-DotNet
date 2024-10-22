@@ -76,12 +76,13 @@ public class PaymentsApiTests : IDisposable
     public async void CreatePaymentForSingleConsentWithDecoupledFlow()
     {
         // create single consent with decoupled flow
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -144,13 +145,14 @@ public class PaymentsApiTests : IDisposable
     public async void CreatePaymentForEnduringConsentWithDecoupledFlow()
     {
         // create enduring consent with decoupled flow
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var maximumAmount = new Amount("50.00", Amount.CurrencyEnum.NZD);
         var fromTimestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, NzTimeZone);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
-            Period.Fortnightly, maximumAmount, ConsentDetail.TypeEnum.Enduring);
+            Period.Fortnightly, maximumAmount, hashedCustomerIdentifier);
 
         var createConsentResponse = await _enduringConsentsApi.CreateEnduringConsentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);

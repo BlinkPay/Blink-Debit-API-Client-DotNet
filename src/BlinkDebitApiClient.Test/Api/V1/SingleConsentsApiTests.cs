@@ -70,7 +70,8 @@ public class SingleConsentsApiTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -80,14 +81,8 @@ public class SingleConsentsApiTests : IDisposable
         var consentId = createConsentResponse.ConsentId;
         Assert.NotEqual(Guid.Empty, consentId);
         Assert.NotEmpty(createConsentResponse.RedirectUri);
-        Assert.StartsWith("https://api-nomatls.apicentre.middleware.co.nz/middleware-nz-sandbox/v2.0/oauth/authorize",
+        Assert.StartsWith("https://obabank.glueware.dev/auth/login?oba_request=",
             createConsentResponse.RedirectUri);
-        Assert.Contains("scope=openid%20payments&response_type=code%20id_token", createConsentResponse.RedirectUri);
-        Assert.Contains("&request=", createConsentResponse.RedirectUri);
-        Assert.Contains("&state=", createConsentResponse.RedirectUri);
-        Assert.Contains("&nonce=", createConsentResponse.RedirectUri);
-        Assert.Contains("&redirect_uri=", createConsentResponse.RedirectUri);
-        Assert.Contains("&client_id=", createConsentResponse.RedirectUri);
 
         // retrieve
         var consent = await _instance.GetSingleConsentAsync(consentId);
@@ -168,12 +163,13 @@ public class SingleConsentsApiTests : IDisposable
     public async void SingleConsentWithDecoupledFlowInPnz()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -204,7 +200,7 @@ public class SingleConsentsApiTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
 
         // revoke
         await _instance.RevokeSingleConsentAsync(consentId);
@@ -229,7 +225,7 @@ public class SingleConsentsApiTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
     }
 
     /// <summary>
@@ -246,7 +242,8 @@ public class SingleConsentsApiTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -330,14 +327,15 @@ public class SingleConsentsApiTests : IDisposable
     public async void SingleConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
-        var decoupledFlowHint = new DecoupledFlowHint(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425");
+        var decoupledFlowHint = new DecoupledFlowHint(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933");
         var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
         var gatewayFlow = new GatewayFlow(RedirectUri, flowHint);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -412,5 +410,78 @@ public class SingleConsentsApiTests : IDisposable
         decoupledFlowHint = gatewayFlow.FlowHint.GetDecoupledFlowHint();
         Assert.Equal(Bank.PNZ, decoupledFlowHint.Bank);
         Assert.Equal(RedirectUri, gatewayFlow.RedirectUri);
+    }
+
+    /// <summary>
+    /// Verify that single consent with redirect to app is created, retrieved and revoked in PNZ
+    /// </summary>
+    [Fact(DisplayName = "Verify that single consent with redirect to app is created, retrieved and revoked in PNZ")]
+    public async void SingleConsentWithRedirectToAppInPnz()
+    {
+        // create
+        var redirectFlow = new RedirectFlow(RedirectUri, Bank.PNZ, true);
+        var authFlowDetail = new AuthFlowDetail(redirectFlow);
+        var authFlow = new AuthFlow(authFlowDetail);
+        var pcr = new Pcr("particulars", "code", "reference");
+        var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
+
+        var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
+            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+
+        Assert.NotNull(createConsentResponse);
+
+        var consentId = createConsentResponse.ConsentId;
+        Assert.NotEqual(Guid.Empty, consentId);
+        Assert.NotEmpty(createConsentResponse.RedirectUri);
+        Assert.StartsWith("https://obabank.glueware.dev/auth/login?oba_request=",
+            createConsentResponse.RedirectUri);
+
+        // retrieve
+        var consent = await _instance.GetSingleConsentAsync(consentId);
+
+        Assert.NotNull(consent);
+        Assert.Equal(Consent.StatusEnum.AwaitingAuthorisation, consent.Status);
+        Assert.Empty(consent.Payments);
+
+        Assert.NotNull(consent.Detail);
+        Assert.IsType<ConsentDetail>(consent.Detail);
+        var detail = consent.Detail.GetSingleConsentRequest();
+
+        Assert.Equal(ConsentDetail.TypeEnum.Single, consent.Detail.Type);
+        Assert.NotNull(detail.Flow);
+        Assert.NotNull(detail.Flow.Detail);
+        Assert.IsType<AuthFlowDetail>(detail.Flow.Detail);
+        var flow = detail.Flow.Detail.GetRedirectFlow();
+
+        Assert.Equal(AuthFlowDetail.TypeEnum.Redirect, flow.Type);
+        Assert.Equal(Bank.PNZ, flow.Bank);
+        Assert.Equal(RedirectUri, flow.RedirectUri);
+        Assert.Equal(true, flow.RedirectToApp);
+
+        // revoke
+        await _instance.RevokeSingleConsentAsync(consentId);
+
+        consent = await _instance.GetSingleConsentAsync(consentId);
+
+        Assert.NotNull(consent);
+        Assert.Equal(Consent.StatusEnum.Revoked, consent.Status);
+        Assert.Empty(consent.Payments);
+
+        Assert.NotNull(consent.Detail);
+        Assert.IsType<ConsentDetail>(consent.Detail);
+        detail = consent.Detail.GetSingleConsentRequest();
+
+        Assert.Equal(ConsentDetail.TypeEnum.Single, consent.Detail.Type);
+        Assert.NotNull(detail.Flow);
+        Assert.NotNull(detail.Flow.Detail);
+        Assert.IsType<AuthFlowDetail>(detail.Flow.Detail);
+        flow = detail.Flow.Detail.GetRedirectFlow();
+
+        Assert.Equal(AuthFlowDetail.TypeEnum.Redirect, flow.Type);
+        Assert.Equal(Bank.PNZ, flow.Bank);
+        Assert.Equal(RedirectUri, flow.RedirectUri);
+        Assert.Equal(true, flow.RedirectToApp);
     }
 }

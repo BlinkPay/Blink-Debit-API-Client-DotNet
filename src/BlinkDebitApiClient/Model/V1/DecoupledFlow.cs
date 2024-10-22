@@ -41,13 +41,13 @@ public class DecoupledFlow : AuthFlowDetail, IEquatable<DecoupledFlow>, IValidat
     /// <summary>
     /// Gets or Sets Bank
     /// </summary>
-    [DataMember(Name = "bank", IsRequired = true, EmitDefaultValue = true)]
+    [DataMember(Name = "bank", EmitDefaultValue = true)]
     public Bank Bank { get; set; }
 
     /// <summary>
     /// Gets or Sets IdentifierType
     /// </summary>
-    [DataMember(Name = "identifier_type", IsRequired = true, EmitDefaultValue = true)]
+    [DataMember(Name = "identifier_type", EmitDefaultValue = true)]
     public IdentifierType IdentifierType { get; set; }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class DecoupledFlow : AuthFlowDetail, IEquatable<DecoupledFlow>, IValidat
     /// The identifier value.
     /// </summary>
     /// <value>The identifier value.</value>
-    [DataMember(Name = "identifier_value", IsRequired = true, EmitDefaultValue = true)]
+    [DataMember(Name = "identifier_value", EmitDefaultValue = true)]
     public string IdentifierValue { get; set; }
 
     /// <summary>

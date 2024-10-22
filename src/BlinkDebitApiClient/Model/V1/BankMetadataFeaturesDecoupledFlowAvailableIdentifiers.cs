@@ -31,11 +31,11 @@ using Newtonsoft.Json;
 namespace BlinkDebitApiClient.Model.V1;
 
 /// <summary>
-/// BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner
+/// BankMetadataFeaturesDecoupledFlowAvailableIdentifiers
 /// </summary>
-[DataContract(Name = "bank_metadata_features_decoupled_flow_available_identifiers_inner")]
-public class BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner :
-    IEquatable<BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner>, IValidatableObject
+[DataContract(Name = "bank_metadata_features_decoupled_flow_available_identifiers")]
+public class BankMetadataFeaturesDecoupledFlowAvailableIdentifiers :
+    IEquatable<BankMetadataFeaturesDecoupledFlowAvailableIdentifiers>, IValidatableObject
 {
     /// <summary>
     /// Gets or Sets Type
@@ -44,27 +44,27 @@ public class BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner :
     public IdentifierType Type { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner" /> class.
+    /// Initializes a new instance of the <see cref="BankMetadataFeaturesDecoupledFlowAvailableIdentifiers" /> class.
     /// </summary>
     [JsonConstructorAttribute]
-    protected BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner()
+    protected BankMetadataFeaturesDecoupledFlowAvailableIdentifiers()
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner" /> class.
+    /// Initializes a new instance of the <see cref="BankMetadataFeaturesDecoupledFlowAvailableIdentifiers" /> class.
     /// </summary>
     /// <param name="type">type (required).</param>
     /// <param name="regex">A regex that can be used for validation of the field.</param>
     /// <param name="name">The common name of the field (required).</param>
     /// <param name="description">The description of the field and/or where to find it.</param>
-    public BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner(IdentifierType type = default(IdentifierType),
+    public BankMetadataFeaturesDecoupledFlowAvailableIdentifiers(IdentifierType type = default(IdentifierType),
         string regex = default(string), string name = default(string), string description = default(string))
     {
         Type = type;
         // to ensure "name" is required (not null)
         Name = name ?? throw new BlinkInvalidValueException(
-            "name is a required property for BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner and cannot be null");
+            "name is a required property for BankMetadataFeaturesDecoupledFlowAvailableIdentifiers and cannot be null");
         Regex = regex;
         Description = description;
     }
@@ -100,7 +100,7 @@ public class BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner :
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.Append("class BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner {\n");
+        sb.Append("class BankMetadataFeaturesDecoupledFlowAvailableIdentifiers {\n");
         sb.Append("  Type: ").Append(Type).Append('\n');
         sb.Append("  Regex: ").Append(Regex).Append('\n');
         sb.Append("  Name: ").Append(Name).Append('\n');
@@ -125,15 +125,15 @@ public class BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner :
     /// <returns>Boolean</returns>
     public override bool Equals(object input)
     {
-        return Equals(input as BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner);
+        return Equals(input as BankMetadataFeaturesDecoupledFlowAvailableIdentifiers);
     }
 
     /// <summary>
-    /// Returns true if BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner instances are equal
+    /// Returns true if BankMetadataFeaturesDecoupledFlowAvailableIdentifiers instances are equal
     /// </summary>
-    /// <param name="input">Instance of BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner to be compared</param>
+    /// <param name="input">Instance of BankMetadataFeaturesDecoupledFlowAvailableIdentifiers to be compared</param>
     /// <returns>Boolean</returns>
-    public bool Equals(BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner input)
+    public bool Equals(BankMetadataFeaturesDecoupledFlowAvailableIdentifiers input)
     {
         if (input == null)
         {

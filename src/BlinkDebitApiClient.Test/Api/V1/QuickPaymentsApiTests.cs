@@ -70,7 +70,8 @@ public class QuickPaymentsApiTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -80,15 +81,8 @@ public class QuickPaymentsApiTests : IDisposable
         var quickPaymentId = createQuickPaymentResponse.QuickPaymentId;
         Assert.NotEqual(Guid.Empty, quickPaymentId);
         Assert.NotEmpty(createQuickPaymentResponse.RedirectUri);
-        Assert.StartsWith("https://api-nomatls.apicentre.middleware.co.nz/middleware-nz-sandbox/v2.0/oauth/authorize",
+        Assert.StartsWith("https://obabank.glueware.dev/auth/login?oba_request=",
             createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("scope=openid%20payments&response_type=code%20id_token",
-            createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&request=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&state=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&nonce=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&redirect_uri=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&client_id=", createQuickPaymentResponse.RedirectUri);
 
         // retrieve
         var quickPayment = await _instance.GetQuickPaymentAsync(quickPaymentId);
@@ -175,12 +169,13 @@ public class QuickPaymentsApiTests : IDisposable
     public async void QuickPaymentWithDecoupledFlowInPnz()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -213,7 +208,7 @@ public class QuickPaymentsApiTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
 
         // revoke
         await _instance.RevokeQuickPaymentAsync(quickPaymentId);
@@ -240,7 +235,7 @@ public class QuickPaymentsApiTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
     }
 
     /// <summary>
@@ -257,7 +252,8 @@ public class QuickPaymentsApiTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
@@ -345,14 +341,15 @@ public class QuickPaymentsApiTests : IDisposable
     public async void QuickPaymentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
-        var decoupledFlowHint = new DecoupledFlowHint(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425");
+        var decoupledFlowHint = new DecoupledFlowHint(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933");
         var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
         var gatewayFlow = new GatewayFlow(RedirectUri, flowHint);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
             Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);

@@ -52,8 +52,8 @@ public class BankMetadataFeaturesDecoupledFlow : IEquatable<BankMetadataFeatures
     /// <param name="availableIdentifiers">If enabled, will show the available fields to use to identify the customer with their bank..</param>
     /// <param name="requestTimeout">ISO8601 time duration until the decoupled flow consent request times out (required).</param>
     public BankMetadataFeaturesDecoupledFlow(bool enabled = default(bool),
-        List<BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner> availableIdentifiers =
-            default(List<BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner>),
+        List<BankMetadataFeaturesDecoupledFlowAvailableIdentifiers> availableIdentifiers =
+            default(List<BankMetadataFeaturesDecoupledFlowAvailableIdentifiers>),
         string requestTimeout = default(string))
     {
         Enabled = enabled;
@@ -75,7 +75,7 @@ public class BankMetadataFeaturesDecoupledFlow : IEquatable<BankMetadataFeatures
     /// </summary>
     /// <value>If enabled, will show the available fields to use to identify the customer with their bank.</value>
     [DataMember(Name = "available_identifiers", EmitDefaultValue = false)]
-    public List<BankMetadataFeaturesDecoupledFlowAvailableIdentifiersInner> AvailableIdentifiers { get; set; }
+    public List<BankMetadataFeaturesDecoupledFlowAvailableIdentifiers> AvailableIdentifiers { get; set; }
 
     /// <summary>
     /// ISO8601 time duration until the decoupled flow consent request times out

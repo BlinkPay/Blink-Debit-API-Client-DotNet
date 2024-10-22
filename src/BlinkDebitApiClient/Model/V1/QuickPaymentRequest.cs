@@ -41,7 +41,7 @@ public class QuickPaymentRequest : SingleConsentRequest, IEquatable<QuickPayment
     /// Initializes a new instance of the <see cref="QuickPaymentRequest" /> class.
     /// </summary>
     [JsonConstructorAttribute]
-    protected QuickPaymentRequest()
+    protected QuickPaymentRequest() : base()
     {
     }
 
@@ -53,7 +53,8 @@ public class QuickPaymentRequest : SingleConsentRequest, IEquatable<QuickPayment
     /// <param name="amount">amount (required).</param>
     /// <param name="type">Whether the consent is single or enduring. (required).</param>
     public QuickPaymentRequest(AuthFlow flow = default(AuthFlow), Pcr pcr = default(Pcr),
-        Amount amount = default(Amount), TypeEnum type = TypeEnum.Single): base(flow, pcr, amount, TypeEnum.Single)
+        Amount amount = default(Amount), string hashedCustomerIdentifier = default(string),
+        TypeEnum type = TypeEnum.Single): base(flow, pcr, amount, hashedCustomerIdentifier, TypeEnum.Single)
     {
         // Type = type;
         // Flow = flow;

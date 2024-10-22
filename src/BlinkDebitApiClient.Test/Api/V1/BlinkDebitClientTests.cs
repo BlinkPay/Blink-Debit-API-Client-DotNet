@@ -85,7 +85,8 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -95,14 +96,8 @@ public class BlinkDebitClientTests : IDisposable
         var consentId = createConsentResponse.ConsentId;
         Assert.NotEqual(Guid.Empty, consentId);
         Assert.NotEmpty(createConsentResponse.RedirectUri);
-        Assert.StartsWith("https://api-nomatls.apicentre.middleware.co.nz/middleware-nz-sandbox/v2.0/oauth/authorize",
+        Assert.StartsWith("https://obabank.glueware.dev/auth/login?oba_request=",
             createConsentResponse.RedirectUri);
-        Assert.Contains("scope=openid%20payments&response_type=code%20id_token", createConsentResponse.RedirectUri);
-        Assert.Contains("&request=", createConsentResponse.RedirectUri);
-        Assert.Contains("&state=", createConsentResponse.RedirectUri);
-        Assert.Contains("&nonce=", createConsentResponse.RedirectUri);
-        Assert.Contains("&redirect_uri=", createConsentResponse.RedirectUri);
-        Assert.Contains("&client_id=", createConsentResponse.RedirectUri);
 
         // retrieve
         try
@@ -142,12 +137,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitAuthorisedSingleConsent()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -178,7 +174,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
     }
 
     /// <summary>
@@ -193,7 +189,8 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -203,14 +200,8 @@ public class BlinkDebitClientTests : IDisposable
         var consentId = createConsentResponse.ConsentId;
         Assert.NotEqual(Guid.Empty, consentId);
         Assert.NotEmpty(createConsentResponse.RedirectUri);
-        Assert.StartsWith("https://api-nomatls.apicentre.middleware.co.nz/middleware-nz-sandbox/v2.0/oauth/authorize",
+        Assert.StartsWith("https://obabank.glueware.dev/auth/login?oba_request=",
             createConsentResponse.RedirectUri);
-        Assert.Contains("scope=openid%20payments&response_type=code%20id_token", createConsentResponse.RedirectUri);
-        Assert.Contains("&request=", createConsentResponse.RedirectUri);
-        Assert.Contains("&state=", createConsentResponse.RedirectUri);
-        Assert.Contains("&nonce=", createConsentResponse.RedirectUri);
-        Assert.Contains("&redirect_uri=", createConsentResponse.RedirectUri);
-        Assert.Contains("&client_id=", createConsentResponse.RedirectUri);
 
         // retrieve
         try
@@ -250,12 +241,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitAuthorisedSingleConsentOrThrowException()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -286,7 +278,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
     }
 
     /// <summary>
@@ -296,13 +288,14 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitTimedOutEnduringConsentThenThrowRuntimeException()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var amount = new Amount("50.00", Amount.CurrencyEnum.NZD);
         var fromTimestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, NzTimeZone);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
-            Period.Fortnightly, amount, ConsentDetail.TypeEnum.Enduring);
+            Period.Fortnightly, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -315,7 +308,7 @@ public class BlinkDebitClientTests : IDisposable
         // retrieve
         try
         {
-            _instance.AwaitAuthorisedEnduringConsent(consentId, 5);
+            _instance.AwaitAuthorisedEnduringConsent(consentId, 1);
         }
         catch (Exception e)
         {
@@ -350,13 +343,14 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitAuthorisedEnduringConsent()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var amount = new Amount("50.00", Amount.CurrencyEnum.NZD);
         var fromTimestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, NzTimeZone);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
-            Period.Fortnightly, amount, ConsentDetail.TypeEnum.Enduring);
+            Period.Fortnightly, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -387,7 +381,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
         Assert.Equal(Period.Fortnightly, detail.Period);
         Assert.NotNull(detail.MaximumAmountPeriod);
         Assert.Equal(Amount.CurrencyEnum.NZD, detail.MaximumAmountPeriod.Currency);
@@ -401,13 +395,14 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitTimedOutEnduringConsentThenThrowConsentTimeoutException()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var amount = new Amount("50.00", Amount.CurrencyEnum.NZD);
         var fromTimestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, NzTimeZone);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
-            Period.Fortnightly, amount, ConsentDetail.TypeEnum.Enduring);
+            Period.Fortnightly, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -455,13 +450,14 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitAuthorisedEnduringConsentOrThrowException()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var amount = new Amount("50.00", Amount.CurrencyEnum.NZD);
         var fromTimestamp = TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, NzTimeZone);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
-            Period.Fortnightly, amount, ConsentDetail.TypeEnum.Enduring);
+            Period.Fortnightly, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -492,7 +488,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
         Assert.Equal(Period.Fortnightly, detail.Period);
         Assert.NotNull(detail.MaximumAmountPeriod);
         Assert.Equal(Amount.CurrencyEnum.NZD, detail.MaximumAmountPeriod.Currency);
@@ -511,7 +507,8 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -521,15 +518,8 @@ public class BlinkDebitClientTests : IDisposable
         var quickPaymentId = createQuickPaymentResponse.QuickPaymentId;
         Assert.NotEqual(Guid.Empty, quickPaymentId);
         Assert.NotEmpty(createQuickPaymentResponse.RedirectUri);
-        Assert.StartsWith("https://api-nomatls.apicentre.middleware.co.nz/middleware-nz-sandbox/v2.0/oauth/authorize",
+        Assert.StartsWith("https://obabank.glueware.dev/auth/login?oba_request=",
             createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("scope=openid%20payments&response_type=code%20id_token",
-            createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&request=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&state=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&nonce=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&redirect_uri=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&client_id=", createQuickPaymentResponse.RedirectUri);
 
         // retrieve
         try
@@ -569,12 +559,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitSuccessfulQuickPayment()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -622,7 +613,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
     }
 
     /// <summary>
@@ -637,7 +628,8 @@ public class BlinkDebitClientTests : IDisposable
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -647,15 +639,8 @@ public class BlinkDebitClientTests : IDisposable
         var quickPaymentId = createQuickPaymentResponse.QuickPaymentId;
         Assert.NotEqual(Guid.Empty, quickPaymentId);
         Assert.NotEmpty(createQuickPaymentResponse.RedirectUri);
-        Assert.StartsWith("https://api-nomatls.apicentre.middleware.co.nz/middleware-nz-sandbox/v2.0/oauth/authorize",
+        Assert.StartsWith("https://obabank.glueware.dev/auth/login?oba_request=",
             createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("scope=openid%20payments&response_type=code%20id_token",
-            createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&request=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&state=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&nonce=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&redirect_uri=", createQuickPaymentResponse.RedirectUri);
-        Assert.Contains("&client_id=", createQuickPaymentResponse.RedirectUri);
 
         // retrieve
         try
@@ -695,12 +680,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitSuccessfulQuickPaymentOrThrowException()
     {
         // create
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new QuickPaymentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -749,7 +735,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
     }
 
     /// <summary>
@@ -759,12 +745,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitTimedOutPaymentThenThrowRuntimeException()
     {
         // create consent
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -795,7 +782,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
 
         // create payment
         var paymentRequest = new PaymentRequest
@@ -846,12 +833,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitSuccessfulPayment()
     {
         // create consent
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -882,7 +870,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
 
         // create payment
         var paymentRequest = new PaymentRequest
@@ -920,12 +908,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitTimedOutPaymentThenThrowPaymentTimeoutException()
     {
         // create consent
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -956,7 +945,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
 
         // create payment
         var paymentRequest = new PaymentRequest
@@ -1007,12 +996,13 @@ public class BlinkDebitClientTests : IDisposable
     public void AwaitAuthorisedPaymentOrThrowException()
     {
         // create consent
-        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+6449144425", CallbackUrl);
+        var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var pcr = new Pcr("particulars", "code", "reference");
         var amount = new Amount("1.25", Amount.CurrencyEnum.NZD);
-        var request = new SingleConsentRequest(authFlow, pcr, amount);
+        var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
+        var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
         var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
             "192.168.0.1", Guid.NewGuid());
@@ -1043,7 +1033,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.Equal(Bank.PNZ, flow.Bank);
         Assert.Equal(CallbackUrl, flow.CallbackUrl);
         Assert.Equal(IdentifierType.PhoneNumber, flow.IdentifierType);
-        Assert.Equal("+6449144425", flow.IdentifierValue);
+        Assert.Equal("+64-259531933", flow.IdentifierValue);
 
         // create payment
         var paymentRequest = new PaymentRequest
