@@ -308,7 +308,7 @@ public class BlinkDebitClientTests : IDisposable
         // retrieve
         try
         {
-            _instance.AwaitAuthorisedEnduringConsent(consentId, 5);
+            _instance.AwaitAuthorisedEnduringConsent(consentId, 1);
         }
         catch (Exception e)
         {
@@ -555,7 +555,7 @@ public class BlinkDebitClientTests : IDisposable
     /// <summary>
     /// Verify that quick payment with decoupled flow is retrieved
     /// </summary>
-    [Fact(DisplayName = "Verify that quick payment with decoupled flow is retrieved", Skip = "Fails in GitHub")]
+    [Fact(DisplayName = "Verify that quick payment with decoupled flow is retrieved")]
     public void AwaitSuccessfulQuickPayment()
     {
         // create
@@ -576,7 +576,7 @@ public class BlinkDebitClientTests : IDisposable
         Assert.NotEqual(Guid.Empty, quickPaymentId);
 
         // retrieve
-        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPayment(quickPaymentId, 300);
+        var quickPaymentResponse = _instance.AwaitSuccessfulQuickPayment(quickPaymentId, 30);
 
         Assert.NotNull(quickPaymentResponse);
         Assert.Contains(quickPaymentResponse.Consent.Status,
