@@ -52,10 +52,13 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
     /// <param name="expiryTimestamp">The ISO 8601 timeout for when an enduring consent will expire. If this field is blank, an indefinite request will be attempted..</param>
     /// <param name="period">period (required).</param>
     /// <param name="maximumAmountPeriod">maximumAmountPeriod (required).</param>
+    /// <param name="hashedCustomerIdentifier">The hashed unique ID of the customer e.g. customer internal ID. SHA-256 is recommended..</param>
     /// <param name="type">Whether the consent is single or enduring. (required).</param>
-    public EnduringConsentRequest(AuthFlow flow = default(AuthFlow), DateTimeOffset fromTimestamp = default(DateTimeOffset),
+    public EnduringConsentRequest(AuthFlow flow = default(AuthFlow),
+        DateTimeOffset fromTimestamp = default(DateTimeOffset),
         DateTimeOffset expiryTimestamp = default(DateTimeOffset), Period period = default(Period),
-        Amount maximumAmountPeriod = default(Amount), TypeEnum type = default(TypeEnum)) : base()
+        Amount maximumAmountPeriod = default(Amount), string hashedCustomerIdentifier = default(string),
+        TypeEnum type = TypeEnum.Enduring) : base()
     {
         // to ensure "flow" is required (not null)
         Flow = flow ?? throw new BlinkInvalidValueException(
@@ -67,6 +70,7 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
             "maximumAmountPeriod is a required property for EnduringConsentRequest and cannot be null");
         ExpiryTimestamp = expiryTimestamp;
         Type = type;
+        HashedCustomerIdentifier = hashedCustomerIdentifier;
     }
 
     /// <summary>
@@ -98,6 +102,13 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
     public Amount MaximumAmountPeriod { get; set; }
 
     /// <summary>
+    /// The hashed unique ID of the customer e.g. customer internal ID. SHA-256 is recommended.
+    /// </summary>
+    /// <value>The hashed unique ID of the customer e.g. customer internal ID. SHA-256 is recommended.</value>
+    [DataMember(Name="hashed_customer_identifier", EmitDefaultValue=false)]
+    public string HashedCustomerIdentifier { get; set; }
+
+    /// <summary>
     /// Returns the string presentation of the object
     /// </summary>
     /// <returns>String presentation of the object</returns>
@@ -111,6 +122,7 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
         sb.Append("  ExpiryTimestamp: ").Append(ExpiryTimestamp).Append('\n');
         sb.Append("  Period: ").Append(Period).Append('\n');
         sb.Append("  MaximumAmountPeriod: ").Append(MaximumAmountPeriod).Append('\n');
+        sb.Append("  HashedCustomerIdentifier: ").Append(HashedCustomerIdentifier).Append("\n");
         sb.Append("}\n");
         return sb.ToString();
     }
@@ -170,6 +182,11 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
                    MaximumAmountPeriod == input.MaximumAmountPeriod ||
                    (MaximumAmountPeriod != null &&
                     MaximumAmountPeriod.Equals(input.MaximumAmountPeriod))
+               ) && base.Equals(input) && 
+               (
+                   HashedCustomerIdentifier == input.HashedCustomerIdentifier ||
+                   (HashedCustomerIdentifier != null &&
+                    HashedCustomerIdentifier.Equals(input.HashedCustomerIdentifier))
                );
     }
 
@@ -201,6 +218,11 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
             if (MaximumAmountPeriod != null)
             {
                 hashCode = (hashCode * 59) + MaximumAmountPeriod.GetHashCode();
+            }
+
+            if (HashedCustomerIdentifier != null)
+            {
+                hashCode = (hashCode * 59) + HashedCustomerIdentifier.GetHashCode();
             }
 
             return hashCode;

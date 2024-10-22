@@ -18,9 +18,9 @@
 10. [Individual API Call Examples](#individual-api-call-examples)
 
 ## Introduction
-This SDK allows merchants with .NET 7-based e-commerce sites to seamlessly integrate with Blink PayNow and Blink AutoPay in order to accept digital payments.
+This SDK allows merchants with .NET 8-based e-commerce sites to seamlessly integrate with Blink PayNow and Blink AutoPay in order to accept digital payments.
 
-This SDK is written in C# 11.
+This SDK is written in C# 12.
 
 ## Contributing
 We welcome contributions from the community. Your pull request will be reviewed by our team.
@@ -28,7 +28,7 @@ We welcome contributions from the community. Your pull request will be reviewed 
 This project is licensed under the MIT License.
 
 ## Minimum Requirements
-- .NET 7 or higher
+- .NET 8 or higher
 
 ## Adding the dependency
 - If via your IDE, look for `BlinkDebitApiClient` in the NuGet tool

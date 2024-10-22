@@ -45,9 +45,11 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
     /// <param name="flow">flow (required).</param>
     /// <param name="pcr">pcr (required).</param>
     /// <param name="amount">amount (required).</param>
+    /// <param name="hashedCustomerIdentifier">The hashed unique ID of the customer e.g. customer internal ID. SHA-256 is recommended..</param>
     /// <param name="type">Whether the consent is single or enduring. (required).</param>
     public SingleConsentRequest(AuthFlow flow = default(AuthFlow), Pcr pcr = default(Pcr),
-        Amount amount = default(Amount), TypeEnum type = TypeEnum.Single) : base()
+        Amount amount = default(Amount), string hashedCustomerIdentifier = default(string), 
+        TypeEnum type = TypeEnum.Single) : base()
     {
         // to ensure "flow" is required (not null)
         Flow = flow ??
@@ -60,6 +62,7 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
         Amount = amount ?? throw new BlinkInvalidValueException(
             "amount is a required property for SingleConsentRequest and cannot be null");
         Type = type;
+        HashedCustomerIdentifier = hashedCustomerIdentifier;
     }
 
     /// <summary>
@@ -81,6 +84,13 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
     public Amount Amount { get; set; }
 
     /// <summary>
+    /// The hashed unique ID of the customer e.g. customer internal ID. SHA-256 is recommended.
+    /// </summary>
+    /// <value>The hashed unique ID of the customer e.g. customer internal ID. SHA-256 is recommended.</value>
+    [DataMember(Name="hashed_customer_identifier", EmitDefaultValue=false)]
+    public string HashedCustomerIdentifier { get; set; }
+
+    /// <summary>
     /// Returns the string presentation of the object
     /// </summary>
     /// <returns>String presentation of the object</returns>
@@ -92,6 +102,7 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
         sb.Append("  Flow: ").Append(Flow).Append('\n');
         sb.Append("  Pcr: ").Append(Pcr).Append('\n');
         sb.Append("  Amount: ").Append(Amount).Append('\n');
+        sb.Append("  HashedCustomerIdentifier: ").Append(HashedCustomerIdentifier).Append("\n");
         sb.Append("}\n");
         return sb.ToString();
     }
@@ -142,6 +153,11 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
                    Amount == input.Amount ||
                    (Amount != null &&
                     Amount.Equals(input.Amount))
+               ) && base.Equals(input) && 
+               (
+                   HashedCustomerIdentifier == input.HashedCustomerIdentifier ||
+                   (HashedCustomerIdentifier != null &&
+                    HashedCustomerIdentifier.Equals(input.HashedCustomerIdentifier))
                );
     }
 
@@ -167,6 +183,11 @@ public class SingleConsentRequest : ConsentDetail, IEquatable<SingleConsentReque
             if (Amount != null)
             {
                 hashCode = (hashCode * 59) + Amount.GetHashCode();
+            }
+
+            if (HashedCustomerIdentifier != null)
+            {
+                hashCode = (hashCode * 59) + HashedCustomerIdentifier.GetHashCode();
             }
 
             return hashCode;

@@ -66,7 +66,7 @@ public class FlowHint : IEquatable<FlowHint>, IValidatableObject
     /// <summary>
     /// Gets or Sets Bank
     /// </summary>
-    [DataMember(Name = "bank", IsRequired = true, EmitDefaultValue = true)]
+    [DataMember(Name = "bank", EmitDefaultValue = true)]
     public Bank Bank { get; set; }
 
     /// <summary>

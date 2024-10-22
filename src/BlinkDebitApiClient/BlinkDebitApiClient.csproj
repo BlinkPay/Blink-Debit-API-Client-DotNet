@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>BlinkDebitApiClient</AssemblyName>
     <PackageId>BlinkDebitApiClient</PackageId>
     <OutputType>Library</OutputType>
     <Authors>Rey Vincent Babilonia (rey.babilonia@blinkpay.co.nz)</Authors>
     <Company>BlinkPay</Company>
-    <AssemblyTitle>Blink Debit API Client for .NET 7</AssemblyTitle>
-    <Description>Blink Debit API Client for .NET 7</Description>
+    <AssemblyTitle>Blink Debit API Client for .NET 8</AssemblyTitle>
+    <Description>Blink Debit API Client for .NET 8</Description>
     <Copyright>Copyright (c) 2023 BlinkPay</Copyright>
     <RootNamespace>BlinkDebitApiClient</RootNamespace>
     <Version>1.0.0-SNAPSHOT</Version>
@@ -26,17 +26,17 @@
 
   <ItemGroup>
     <PackageReference Include="JsonSubTypes" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
-    <PackageReference Include="RestSharp" Version="110.2.0" />
-    <PackageReference Include="Polly" Version="7.2.3" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="Polly" Version="8.4.2" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
   </ItemGroup>
 
   <ItemGroup>

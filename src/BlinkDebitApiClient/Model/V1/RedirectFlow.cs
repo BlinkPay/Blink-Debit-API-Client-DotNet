@@ -41,7 +41,7 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
     /// <summary>
     /// Gets or Sets Bank
     /// </summary>
-    [DataMember(Name = "bank", IsRequired = true, EmitDefaultValue = true)]
+    [DataMember(Name = "bank", EmitDefaultValue = true)]
     public Bank Bank { get; set; }
 
     /// <summary>
@@ -57,9 +57,10 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
     /// </summary>
     /// <param name="redirectUri">The URI to redirect back to once the consent is completed. App-based workflows may use deep/universal links. The &#x60;cid&#x60; (Consent ID) will be added as a URL parameter. If there is an error, an &#x60;error&#x60; parameter will be appended also. (required).</param>
     /// <param name="bank">bank (required).</param>
+    /// <param name="redirectToApp">Whether the redirect URI goes back to an app directly. If this value is true, the app will receive code and state parameters with this redirection. The app must pass these through to us at: https://debit.blinkpay.co.nz/bank/1.0/return?state&#x3D;{state}&amp;code&#x3D;{code}, along with other query parameters like error. Applies only to Redirect flow. (default to false).</param>
     /// <param name="type">Whether to use Blink Gateway, redirect or decoupled flow. (required).</param>
     public RedirectFlow(string redirectUri = default(string), Bank bank = default(Bank),
-        TypeEnum type = TypeEnum.Redirect) : base()
+        bool? redirectToApp = false, TypeEnum type = TypeEnum.Redirect) : base()
     {
         // to ensure "redirectUri" is required (not null)
         RedirectUri = redirectUri ??
@@ -67,6 +68,7 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
                           "redirectUri is a required property for RedirectFlow and cannot be null");
         Bank = bank;
         Type = type;
+        RedirectToApp = redirectToApp;
     }
 
     /// <summary>
@@ -75,6 +77,13 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
     /// <value>The URI to redirect back to once the consent is completed. App-based workflows may use deep/universal links. The &#x60;cid&#x60; (Consent ID) will be added as a URL parameter. If there is an error, an &#x60;error&#x60; parameter will be appended also.</value>
     [DataMember(Name = "redirect_uri", IsRequired = true, EmitDefaultValue = true)]
     public string RedirectUri { get; set; }
+
+    /// <summary>
+    /// Whether the redirect URI goes back to an app directly. If this value is true, the app will receive code and state parameters with this redirection. The app must pass these through to us at: https://debit.blinkpay.co.nz/bank/1.0/return?state&#x3D;{state}&amp;code&#x3D;{code}, along with other query parameters like error. Applies only to Redirect flow.
+    /// </summary>
+    /// <value>Whether the redirect URI goes back to an app directly. If this value is true, the app will receive code and state parameters with this redirection. The app must pass these through to us at: https://debit.blinkpay.co.nz/bank/1.0/return?state&#x3D;{state}&amp;code&#x3D;{code}, along with other query parameters like error. Applies only to Redirect flow.</value>
+    [DataMember(Name="redirect_to_app", EmitDefaultValue=false)]
+    public bool? RedirectToApp { get; set; }
 
     /// <summary>
     /// Returns the string presentation of the object
@@ -87,6 +96,7 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
         sb.Append("  ").Append(base.ToString().Replace("\n", "\n  ")).Append('\n');
         sb.Append("  RedirectUri: ").Append(RedirectUri).Append('\n');
         sb.Append("  Bank: ").Append(Bank).Append('\n');
+        sb.Append("  RedirectToApp: ").Append(RedirectToApp).Append("\n");
         sb.Append("}\n");
         return sb.ToString();
     }
@@ -131,6 +141,11 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
                (
                    Bank == input.Bank ||
                    Bank.Equals(input.Bank)
+               )&& base.Equals(input) && 
+               (
+                   RedirectToApp == input.RedirectToApp ||
+                   (RedirectToApp != null &&
+                    RedirectToApp.Equals(input.RedirectToApp))
                );
     }
 
@@ -146,6 +161,14 @@ public class RedirectFlow : AuthFlowDetail, IEquatable<RedirectFlow>, IValidatab
             if (RedirectUri != null)
             {
                 hashCode = (hashCode * 59) + RedirectUri.GetHashCode();
+            }
+            if (Bank != null)
+            {
+                hashCode = (hashCode * 59) + Bank.GetHashCode();
+            }
+            if (RedirectToApp != null)
+            {
+                hashCode = (hashCode * 59) + RedirectToApp.GetHashCode();
             }
 
             hashCode = (hashCode * 59) + Bank.GetHashCode();
