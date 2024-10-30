@@ -174,7 +174,7 @@ public class Configuration : IReadableConfiguration
     public Configuration()
     {
         Proxy = null;
-        UserAgent = WebUtility.UrlEncode(".NET/Blink SDK 1.0");
+        UserAgent = WebUtility.UrlEncode(".NET/Blink SDK 1.1");
         BasePath = "https://sandbox.debit.blinkpay.co.nz/payments/v1";
         DefaultHeaders = new ConcurrentDictionary<string, string>();
         ApiKey = new ConcurrentDictionary<string, string>();

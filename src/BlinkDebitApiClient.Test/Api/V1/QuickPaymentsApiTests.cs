@@ -21,7 +21,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using BlinkDebitApiClient.Api.V1;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
 using Xunit;
 
@@ -37,16 +39,24 @@ public class QuickPaymentsApiTests : IDisposable
 
     private const string CallbackUrl = "https://www.mymerchant.co.nz/callback";
 
+    private static readonly Dictionary<string, string?> RequestHeaders = new Dictionary<string, string?>();
+
     private readonly QuickPaymentsApi _instance;
 
     public QuickPaymentsApiTests(BlinkDebitFixture fixture)
     {
         _instance = fixture.QuickPaymentsApi;
+        
+        RequestHeaders[BlinkDebitConstant.REQUEST_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CORRELATION_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_IP.GetValue()] = "192.168.0.1";
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_USER_AGENT.GetValue()] = "demo-api-client";
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
     }
 
     public void Dispose()
     {
-        // Cleanup when everything is done.
+        RequestHeaders.Clear();
     }
 
     /// <summary>
@@ -73,8 +83,7 @@ public class QuickPaymentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(RequestHeaders, request);
 
         Assert.NotNull(createQuickPaymentResponse);
 
@@ -177,8 +186,7 @@ public class QuickPaymentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(RequestHeaders, request);
 
         Assert.NotNull(createQuickPaymentResponse);
 
@@ -255,8 +263,7 @@ public class QuickPaymentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(RequestHeaders, request);
 
         Assert.NotNull(createQuickPaymentResponse);
 
@@ -351,8 +358,7 @@ public class QuickPaymentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createQuickPaymentResponse = await _instance.CreateQuickPaymentAsync(RequestHeaders, request);
 
         Assert.NotNull(createQuickPaymentResponse);
 
