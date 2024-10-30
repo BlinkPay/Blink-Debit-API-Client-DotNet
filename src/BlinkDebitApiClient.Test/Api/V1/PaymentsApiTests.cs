@@ -21,8 +21,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BlinkDebitApiClient.Api.V1;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
 using Xunit;
 using Xunit.Abstractions;
@@ -41,6 +43,8 @@ public class PaymentsApiTests : IDisposable
 
     private static readonly TimeZoneInfo NzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
 
+    private static readonly Dictionary<string, string?> RequestHeaders = new Dictionary<string, string?>();
+
     private readonly EnduringConsentsApi _enduringConsentsApi;
 
     private readonly SingleConsentsApi _singleConsentsApi;
@@ -53,11 +57,17 @@ public class PaymentsApiTests : IDisposable
         _instance = fixture.PaymentsApi;
         _enduringConsentsApi = fixture.EnduringConsentsApi;
         _singleConsentsApi = fixture.SingleConsentsApi;
+
+        RequestHeaders[BlinkDebitConstant.REQUEST_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CORRELATION_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_IP.GetValue()] = "192.168.0.1";
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_USER_AGENT.GetValue()] = "demo-api-client";
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
     }
 
     public void Dispose()
     {
-        // Cleanup when everything is done.
+        RequestHeaders.Clear();
     }
 
     /// <summary>
@@ -84,14 +94,14 @@ public class PaymentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
         var consentId = createConsentResponse.ConsentId;
         Assert.True(string.IsNullOrEmpty(createConsentResponse.RedirectUri));
 
         var paymentId = Guid.Empty;
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         for (var i = 1; i <= 10; i++)
         {
             _testOutputHelper.WriteLine($"attempt: {i}");
@@ -103,8 +113,7 @@ public class PaymentsApiTests : IDisposable
                     ConsentId = consentId
                 };
 
-                var paymentResponse = await _instance.CreatePaymentAsync(Guid.NewGuid(), Guid.NewGuid(),
-                    Guid.NewGuid(), paymentRequest);
+                var paymentResponse = await _instance.CreatePaymentAsync(RequestHeaders, paymentRequest);
 
                 Assert.NotNull(paymentResponse);
                 paymentId = paymentResponse.PaymentId;
@@ -154,15 +163,14 @@ public class PaymentsApiTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, maximumAmount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _enduringConsentsApi.CreateEnduringConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
-
+        var createConsentResponse = await _enduringConsentsApi.CreateEnduringConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
         var consentId = createConsentResponse.ConsentId;
         Assert.True(string.IsNullOrEmpty(createConsentResponse.RedirectUri));
 
         var paymentId = Guid.Empty;
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         for (var i = 1; i <= 10; i++)
         {
             _testOutputHelper.WriteLine($"attempt: {i}");
@@ -174,8 +182,7 @@ public class PaymentsApiTests : IDisposable
                 var enduringPaymentRequest = new EnduringPaymentRequest(pcr, amount);
                 var paymentRequest = new PaymentRequest(consentId, enduringPaymentRequest);
 
-                var paymentResponse = await _instance.CreatePaymentAsync(Guid.NewGuid(), Guid.NewGuid(),
-                    Guid.NewGuid(), paymentRequest);
+                var paymentResponse = await _instance.CreatePaymentAsync(RequestHeaders, paymentRequest);
 
                 Assert.NotNull(paymentResponse);
                 paymentId = paymentResponse.PaymentId;

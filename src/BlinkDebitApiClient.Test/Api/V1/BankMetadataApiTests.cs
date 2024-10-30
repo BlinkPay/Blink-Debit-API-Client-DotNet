@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using BlinkDebitApiClient.Api.V1;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
 using Xunit;
 
@@ -34,16 +35,24 @@ namespace BlinkDebitApiClient.Test.Api.V1;
 [Collection("Blink Debit Collection")]
 public class BankMetadataApiTests : IDisposable
 {
+    private static readonly Dictionary<string, string?> RequestHeaders = new Dictionary<string, string?>();
+
     private readonly BankMetadataApi _instance;
 
     public BankMetadataApiTests(BlinkDebitFixture fixture)
     {
         _instance = fixture.BankMetadataApi;
+
+        RequestHeaders[BlinkDebitConstant.REQUEST_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CORRELATION_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_IP.GetValue()] = "192.168.0.1";
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_USER_AGENT.GetValue()] = "demo-api-client";
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
     }
 
     public void Dispose()
     {
-        // Cleanup when everything is done.
+        RequestHeaders.Clear();
     }
 
     /// <summary>
@@ -61,7 +70,7 @@ public class BankMetadataApiTests : IDisposable
     [Fact(DisplayName = "Verify that bank metadata is retrieved")]
     public async void GetMeta()
     {
-        var response = await _instance.GetMetaAsync(Guid.NewGuid(), Guid.NewGuid());
+        var response = await _instance.GetMetaAsync(RequestHeaders);
         Assert.IsType<List<BankMetadata>>(response);
         Assert.Equal(5, response.Count);
     }

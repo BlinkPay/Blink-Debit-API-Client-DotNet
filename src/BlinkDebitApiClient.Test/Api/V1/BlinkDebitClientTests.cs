@@ -23,6 +23,7 @@
 using System;
 using System.Collections.Generic;
 using BlinkDebitApiClient.Api.V1;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
 using Xunit;
@@ -41,16 +42,24 @@ public class BlinkDebitClientTests : IDisposable
 
     private static readonly TimeZoneInfo NzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
 
+    private static readonly Dictionary<string, string?> RequestHeaders = new Dictionary<string, string?>();
+
     private BlinkDebitClient _instance;
 
     public BlinkDebitClientTests(BlinkDebitFixture fixture)
     {
         _instance = fixture.BlinkDebitClient;
+
+        RequestHeaders[BlinkDebitConstant.REQUEST_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CORRELATION_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_IP.GetValue()] = "192.168.0.1";
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_USER_AGENT.GetValue()] = "demo-api-client";
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
     }
 
     public void Dispose()
     {
-        // Cleanup when everything is done.
+        RequestHeaders.Clear();
     }
 
     /// <summary>
@@ -68,7 +77,7 @@ public class BlinkDebitClientTests : IDisposable
     [Fact(DisplayName = "Verify that bank metadata is retrieved")]
     public async void GetMeta()
     {
-        var response = await _instance.GetMetaAsync(Guid.NewGuid(), Guid.NewGuid());
+        var response = await _instance.GetMetaAsync(RequestHeaders);
         Assert.IsType<List<BankMetadata>>(response);
         Assert.Equal(5, response.Count);
     }
@@ -88,8 +97,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -145,8 +153,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -192,8 +199,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -249,8 +255,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -297,8 +302,7 @@ public class BlinkDebitClientTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateEnduringConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -352,8 +356,7 @@ public class BlinkDebitClientTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateEnduringConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -404,8 +407,7 @@ public class BlinkDebitClientTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateEnduringConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -459,8 +461,7 @@ public class BlinkDebitClientTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateEnduringConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateEnduringConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -510,8 +511,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, RequestHeaders);
 
         Assert.NotNull(createQuickPaymentResponse);
 
@@ -567,8 +567,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, RequestHeaders);
 
         Assert.NotNull(createQuickPaymentResponse);
 
@@ -631,8 +630,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, RequestHeaders);
 
         Assert.NotNull(createQuickPaymentResponse);
 
@@ -688,8 +686,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new QuickPaymentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createQuickPaymentResponse = _instance.CreateQuickPayment(request, RequestHeaders);
 
         Assert.NotNull(createQuickPaymentResponse);
 
@@ -753,8 +750,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -790,7 +786,8 @@ public class BlinkDebitClientTests : IDisposable
             ConsentId = consentId
         };
 
-        var paymentResponse = _instance.CreatePayment(paymentRequest, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
+        var paymentResponse = _instance.CreatePayment(paymentRequest, RequestHeaders);
 
         Assert.NotNull(paymentResponse);
         var paymentId = paymentResponse.PaymentId;
@@ -841,8 +838,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -878,7 +874,8 @@ public class BlinkDebitClientTests : IDisposable
             ConsentId = consentId
         };
 
-        var paymentResponse = _instance.CreatePayment(paymentRequest, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
+        var paymentResponse = _instance.CreatePayment(paymentRequest, RequestHeaders);
 
         Assert.NotNull(paymentResponse);
         var paymentId = paymentResponse.PaymentId;
@@ -916,8 +913,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -953,7 +949,8 @@ public class BlinkDebitClientTests : IDisposable
             ConsentId = consentId
         };
 
-        var paymentResponse = _instance.CreatePayment(paymentRequest, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
+        var paymentResponse = _instance.CreatePayment(paymentRequest, RequestHeaders);
 
         Assert.NotNull(paymentResponse);
         var paymentId = paymentResponse.PaymentId;
@@ -1004,8 +1001,7 @@ public class BlinkDebitClientTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = _instance.CreateSingleConsent(request, Guid.NewGuid(), Guid.NewGuid(),
-            "192.168.0.1", Guid.NewGuid());
+        var createConsentResponse = _instance.CreateSingleConsent(request, RequestHeaders);
 
         Assert.NotNull(createConsentResponse);
 
@@ -1041,7 +1037,8 @@ public class BlinkDebitClientTests : IDisposable
             ConsentId = consentId
         };
 
-        var paymentResponse = _instance.CreatePayment(paymentRequest, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
+        var paymentResponse = _instance.CreatePayment(paymentRequest, RequestHeaders);
 
         Assert.NotNull(paymentResponse);
         var paymentId = paymentResponse.PaymentId;

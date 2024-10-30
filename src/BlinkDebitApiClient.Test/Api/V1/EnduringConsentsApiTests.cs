@@ -21,7 +21,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using BlinkDebitApiClient.Api.V1;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
 using Xunit;
 
@@ -39,16 +41,24 @@ public class EnduringConsentsApiTests : IDisposable
 
     private static readonly TimeZoneInfo NzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
 
+    private static readonly Dictionary<string, string?> RequestHeaders = new Dictionary<string, string?>();
+
     private readonly EnduringConsentsApi _instance;
 
     public EnduringConsentsApiTests(BlinkDebitFixture fixture)
     {
         _instance = fixture.EnduringConsentsApi;
+
+        RequestHeaders[BlinkDebitConstant.REQUEST_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CORRELATION_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_IP.GetValue()] = "192.168.0.1";
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_USER_AGENT.GetValue()] = "demo-api-client";
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
     }
 
     public void Dispose()
     {
-        // Cleanup when everything is done.
+        RequestHeaders.Clear();
     }
 
     /// <summary>
@@ -76,8 +86,7 @@ public class EnduringConsentsApiTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateEnduringConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateEnduringConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
@@ -175,7 +184,7 @@ public class EnduringConsentsApiTests : IDisposable
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933",
-            CallbackUrl, AuthFlowDetail.TypeEnum.Decoupled);
+            CallbackUrl);
         var authFlowDetail = new AuthFlowDetail(decoupledFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var amount = new Amount("50.00", Amount.CurrencyEnum.NZD);
@@ -184,8 +193,7 @@ public class EnduringConsentsApiTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateEnduringConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateEnduringConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
@@ -256,9 +264,9 @@ public class EnduringConsentsApiTests : IDisposable
     public async void EnduringConsentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
-        var redirectFlowHint = new RedirectFlowHint(Bank.PNZ, FlowHint.TypeEnum.Redirect);
+        var redirectFlowHint = new RedirectFlowHint(Bank.PNZ);
         var flowHint = new GatewayFlowAllOfFlowHint(redirectFlowHint);
-        var gatewayFlow = new GatewayFlow(RedirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+        var gatewayFlow = new GatewayFlow(RedirectUri, flowHint);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var amount = new Amount("50.00", Amount.CurrencyEnum.NZD);
@@ -267,8 +275,7 @@ public class EnduringConsentsApiTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateEnduringConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateEnduringConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
@@ -344,9 +351,9 @@ public class EnduringConsentsApiTests : IDisposable
     {
         // create
         var decoupledFlowHint = new DecoupledFlowHint(Bank.PNZ,
-            IdentifierType.PhoneNumber, "+64-259531933", FlowHint.TypeEnum.Decoupled);
+            IdentifierType.PhoneNumber, "+64-259531933");
         var flowHint = new GatewayFlowAllOfFlowHint(decoupledFlowHint);
-        var gatewayFlow = new GatewayFlow(RedirectUri, flowHint, AuthFlowDetail.TypeEnum.Gateway);
+        var gatewayFlow = new GatewayFlow(RedirectUri, flowHint);
         var authFlowDetail = new AuthFlowDetail(gatewayFlow);
         var authFlow = new AuthFlow(authFlowDetail);
         var amount = new Amount("50.00", Amount.CurrencyEnum.NZD);
@@ -355,8 +362,7 @@ public class EnduringConsentsApiTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateEnduringConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateEnduringConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 

@@ -21,8 +21,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BlinkDebitApiClient.Api.V1;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Exceptions;
 using BlinkDebitApiClient.Model.V1;
 using Xunit;
@@ -42,6 +44,8 @@ public class RefundsApiTests : IDisposable
 
     private static readonly TimeZoneInfo NzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
 
+    private static readonly Dictionary<string, string?> RequestHeaders = new Dictionary<string, string?>();
+
     private readonly EnduringConsentsApi _enduringConsentsApi;
 
     private readonly SingleConsentsApi _singleConsentsApi;
@@ -57,11 +61,17 @@ public class RefundsApiTests : IDisposable
         _enduringConsentsApi = fixture.EnduringConsentsApi;
         _singleConsentsApi = fixture.SingleConsentsApi;
         _paymentsApi = fixture.PaymentsApi;
+
+        RequestHeaders[BlinkDebitConstant.REQUEST_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CORRELATION_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_IP.GetValue()] = "192.168.0.1";
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_USER_AGENT.GetValue()] = "demo-api-client";
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
     }
 
     public void Dispose()
     {
-        // Cleanup when everything is done.
+        RequestHeaders.Clear();
     }
 
     /// <summary>
@@ -89,14 +99,14 @@ public class RefundsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
         var consentId = createConsentResponse.ConsentId;
         Assert.True(string.IsNullOrEmpty(createConsentResponse.RedirectUri));
 
         var paymentId = Guid.Empty;
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         for (var i = 1; i <= 10; i++)
         {
             _testOutputHelper.WriteLine($"attempt: {i}");
@@ -108,8 +118,7 @@ public class RefundsApiTests : IDisposable
                     ConsentId = consentId
                 };
 
-                var paymentResponse = await _paymentsApi.CreatePaymentAsync(Guid.NewGuid(), Guid.NewGuid(),
-                    Guid.NewGuid(), paymentRequest);
+                var paymentResponse = await _paymentsApi.CreatePaymentAsync(RequestHeaders, paymentRequest);
 
                 Assert.NotNull(paymentResponse);
                 paymentId = paymentResponse.PaymentId;
@@ -128,14 +137,14 @@ public class RefundsApiTests : IDisposable
         // create account number refund
         var refundRequest = new AccountNumberRefundRequest(paymentId);
 
-        var refundResponse = await _instance.CreateRefundAsync(Guid.NewGuid(), Guid.NewGuid(), refundRequest);
+        var refundResponse = await _instance.CreateRefundAsync(RequestHeaders, refundRequest);
 
         Assert.NotNull(refundResponse);
         var refundId = refundResponse.RefundId;
         Assert.NotEqual(Guid.Empty, refundId);
 
         // retrieve account number refund
-        var refund = await _instance.GetRefundAsync(refundId, Guid.NewGuid(), Guid.NewGuid());
+        var refund = await _instance.GetRefundAsync(refundId, RequestHeaders);
 
         Assert.Equal(Refund.StatusEnum.Completed, refund.Status);
         Assert.NotNull(refund.AccountNumber);
@@ -165,14 +174,14 @@ public class RefundsApiTests : IDisposable
         var request = new EnduringConsentRequest(authFlow, fromTimestamp, default,
             Period.Fortnightly, maximumAmount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _enduringConsentsApi.CreateEnduringConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _enduringConsentsApi.CreateEnduringConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
         var consentId = createConsentResponse.ConsentId;
         Assert.True(string.IsNullOrEmpty(createConsentResponse.RedirectUri));
 
         var paymentId = Guid.Empty;
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         for (var i = 1; i <= 10; i++)
         {
             _testOutputHelper.WriteLine($"attempt: {i}");
@@ -183,8 +192,7 @@ public class RefundsApiTests : IDisposable
                 var enduringPaymentRequest = new EnduringPaymentRequest(pcr, amount);
                 var paymentRequest = new PaymentRequest(consentId, enduringPaymentRequest);
 
-                var paymentResponse = await _paymentsApi.CreatePaymentAsync(Guid.NewGuid(), Guid.NewGuid(),
-                    Guid.NewGuid(), paymentRequest);
+                var paymentResponse = await _paymentsApi.CreatePaymentAsync(RequestHeaders, paymentRequest);
 
                 Assert.NotNull(paymentResponse);
                 paymentId = paymentResponse.PaymentId;
@@ -203,14 +211,14 @@ public class RefundsApiTests : IDisposable
         // create account number refund
         var refundRequest = new AccountNumberRefundRequest(paymentId);
 
-        var refundResponse = await _instance.CreateRefundAsync(Guid.NewGuid(), Guid.NewGuid(), refundRequest);
+        var refundResponse = await _instance.CreateRefundAsync(RequestHeaders, refundRequest);
 
         Assert.NotNull(refundResponse);
         var refundId = refundResponse.RefundId;
         Assert.NotEqual(Guid.Empty, refundId);
 
         // retrieve account number refund
-        var refund = await _instance.GetRefundAsync(refundId, Guid.NewGuid(), Guid.NewGuid());
+        var refund = await _instance.GetRefundAsync(refundId, RequestHeaders);
 
         Assert.Equal(Refund.StatusEnum.Completed, refund.Status);
         Assert.NotNull(refund.AccountNumber);
@@ -238,14 +246,14 @@ public class RefundsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
         var consentId = createConsentResponse.ConsentId;
         Assert.True(string.IsNullOrEmpty(createConsentResponse.RedirectUri));
 
         var paymentId = Guid.Empty;
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         for (var i = 1; i <= 10; i++)
         {
             _testOutputHelper.WriteLine($"attempt: {i}");
@@ -257,8 +265,7 @@ public class RefundsApiTests : IDisposable
                     ConsentId = consentId
                 };
 
-                var paymentResponse = await _paymentsApi.CreatePaymentAsync(Guid.NewGuid(), Guid.NewGuid(),
-                    Guid.NewGuid(), paymentRequest);
+                var paymentResponse = await _paymentsApi.CreatePaymentAsync(RequestHeaders, paymentRequest);
 
                 Assert.NotNull(paymentResponse);
                 paymentId = paymentResponse.PaymentId;
@@ -279,7 +286,7 @@ public class RefundsApiTests : IDisposable
 
         try
         {
-            await _instance.CreateRefundAsync(Guid.NewGuid(), Guid.NewGuid(), refundRequest);
+            await _instance.CreateRefundAsync(RequestHeaders, refundRequest);
         }
         catch (Exception e)
         {
@@ -303,14 +310,14 @@ public class RefundsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _singleConsentsApi.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
         var consentId = createConsentResponse.ConsentId;
         Assert.True(string.IsNullOrEmpty(createConsentResponse.RedirectUri));
 
         var paymentId = Guid.Empty;
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         for (var i = 1; i <= 10; i++)
         {
             _testOutputHelper.WriteLine($"attempt: {i}");
@@ -322,8 +329,7 @@ public class RefundsApiTests : IDisposable
                     ConsentId = consentId
                 };
 
-                var paymentResponse = await _paymentsApi.CreatePaymentAsync(Guid.NewGuid(), Guid.NewGuid(),
-                    Guid.NewGuid(), paymentRequest);
+                var paymentResponse = await _paymentsApi.CreatePaymentAsync(RequestHeaders, paymentRequest);
 
                 Assert.NotNull(paymentResponse);
                 paymentId = paymentResponse.PaymentId;
@@ -345,7 +351,7 @@ public class RefundsApiTests : IDisposable
 
         try
         {
-            await _instance.CreateRefundAsync(Guid.NewGuid(), Guid.NewGuid(), refundRequest);
+            await _instance.CreateRefundAsync(RequestHeaders, refundRequest);
         }
         catch (Exception e)
         {

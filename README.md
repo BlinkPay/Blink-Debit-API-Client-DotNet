@@ -478,15 +478,6 @@ var paymentRequest = new PaymentRequest(consentId, enduringPaymentRequest);
 
 var paymentResponse = client.CreatePayment(request);
 ```
-#### Westpac
-Westpac requires you to specify which account of the customers to debit.
-
-The available selection of accounts is supplied to you in the consent response of an Authorised Westpac consent object, and the ID of the selected account in supplied here.
-```csharp
-var request = new PaymentRequest(consentId, null, accountReferenceId);
-
-var paymentResponse = client.CreateWestpacPayment(request);
-```
 #### Retrieval
 ```csharp
 var payment = client.GetPayment(paymentId);

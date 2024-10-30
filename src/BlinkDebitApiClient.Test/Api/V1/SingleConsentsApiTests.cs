@@ -21,7 +21,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using BlinkDebitApiClient.Api.V1;
+using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
 using Xunit;
 
@@ -37,16 +39,25 @@ public class SingleConsentsApiTests : IDisposable
 
     private const string CallbackUrl = "https://www.mymerchant.co.nz/callback";
 
+    private static readonly Dictionary<string, string?> RequestHeaders = new Dictionary<string, string?>();
+
     private readonly SingleConsentsApi _instance;
 
     public SingleConsentsApiTests(BlinkDebitFixture fixture)
     {
         _instance = fixture.SingleConsentsApi;
+
+
+        RequestHeaders[BlinkDebitConstant.REQUEST_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CORRELATION_ID.GetValue()] = Guid.NewGuid().ToString();
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_IP.GetValue()] = "192.168.0.1";
+        RequestHeaders[BlinkDebitConstant.CUSTOMER_USER_AGENT.GetValue()] = "demo-api-client";
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
     }
 
     public void Dispose()
     {
-        // Cleanup when everything is done.
+        RequestHeaders.Clear();
     }
 
     /// <summary>
@@ -73,8 +84,7 @@ public class SingleConsentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
@@ -171,8 +181,7 @@ public class SingleConsentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
@@ -231,7 +240,8 @@ public class SingleConsentsApiTests : IDisposable
     /// <summary>
     /// Verify that single consent with gateway flow and redirect flow hint is created, retrieved and revoked in PNZ
     /// </summary>
-    [Fact(DisplayName = "Verify that single consent with gateway flow and redirect flow hint is created, retrieved and revoked in PNZ")]
+    [Fact(DisplayName =
+        "Verify that single consent with gateway flow and redirect flow hint is created, retrieved and revoked in PNZ")]
     public async void SingleConsentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
@@ -245,8 +255,7 @@ public class SingleConsentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
@@ -323,7 +332,8 @@ public class SingleConsentsApiTests : IDisposable
     /// <summary>
     /// Verify that single consent with gateway flow and decoupled flow hint is created, retrieved and revoked in PNZ
     /// </summary>
-    [Fact(DisplayName = "Verify that single consent with gateway flow and decoupled flow hint is created, retrieved and revoked in PNZ")]
+    [Fact(DisplayName =
+        "Verify that single consent with gateway flow and decoupled flow hint is created, retrieved and revoked in PNZ")]
     public async void SingleConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
@@ -337,8 +347,7 @@ public class SingleConsentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
@@ -427,8 +436,7 @@ public class SingleConsentsApiTests : IDisposable
         var hashedCustomerIdentifier = "88df3798e32512ac340164f7ed133343d6dcb4888e4a91b03512dedd9800d12e";
         var request = new SingleConsentRequest(authFlow, pcr, amount, hashedCustomerIdentifier);
 
-        var createConsentResponse = await _instance.CreateSingleConsentAsync(Guid.NewGuid(),
-            Guid.NewGuid(), "192.168.0.1", Guid.NewGuid(), request);
+        var createConsentResponse = await _instance.CreateSingleConsentAsync(RequestHeaders, request);
 
         Assert.NotNull(createConsentResponse);
 
