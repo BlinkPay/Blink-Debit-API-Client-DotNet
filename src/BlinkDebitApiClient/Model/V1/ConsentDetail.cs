@@ -64,8 +64,8 @@ public class ConsentDetail : AbstractOpenAPISchema, IEquatable<ConsentDetail>, I
     /// The type of payment (single or enduring).
     /// </summary>
     /// <value>The type of payment (single or enduring).</value>
-    [DataMember(Name = "type", IsRequired = true, EmitDefaultValue = true)]
-    public TypeEnum Type { get; set; }
+    [DataMember(Name = "type", EmitDefaultValue = false)]
+    public TypeEnum? Type { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConsentDetail" /> class.
@@ -74,7 +74,7 @@ public class ConsentDetail : AbstractOpenAPISchema, IEquatable<ConsentDetail>, I
     public ConsentDetail()
     {
     }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ConsentDetail" /> class
     /// with the <see cref="EnduringConsentRequest" /> class
@@ -84,7 +84,8 @@ public class ConsentDetail : AbstractOpenAPISchema, IEquatable<ConsentDetail>, I
     {
         IsNullable = false;
         SchemaType = "oneOf";
-        ActualInstance = actualInstance ?? throw new BlinkInvalidValueException("Invalid instance found. Must not be null.");
+        ActualInstance = actualInstance ??
+                         throw new BlinkInvalidValueException("Invalid instance found. Must not be null.");
     }
 
     /// <summary>
@@ -96,7 +97,8 @@ public class ConsentDetail : AbstractOpenAPISchema, IEquatable<ConsentDetail>, I
     {
         IsNullable = false;
         SchemaType = "oneOf";
-        ActualInstance = actualInstance ?? throw new BlinkInvalidValueException("Invalid instance found. Must not be null.");
+        ActualInstance = actualInstance ??
+                         throw new BlinkInvalidValueException("Invalid instance found. Must not be null.");
     }
 
 

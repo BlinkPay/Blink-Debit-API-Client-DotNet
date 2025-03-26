@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text;
-using BlinkDebitApiClient.Exceptions;
 using Newtonsoft.Json;
 
 namespace BlinkDebitApiClient.Model.V1;
@@ -47,33 +46,35 @@ public class BankMetadataFeatures : IEquatable<BankMetadataFeatures>, IValidatab
     /// <summary>
     /// Initializes a new instance of the <see cref="BankMetadataFeatures" /> class.
     /// </summary>
-    /// <param name="enduringConsent">enduringConsent (required).</param>
-    /// <param name="decoupledFlow">decoupledFlow (required).</param>
-    public BankMetadataFeatures(
-        BankMetadataFeaturesEnduringConsent enduringConsent = default(BankMetadataFeaturesEnduringConsent),
-        BankMetadataFeaturesDecoupledFlow decoupledFlow = default(BankMetadataFeaturesDecoupledFlow))
+    /// <param name="enduringConsent">enduringConsent.</param>
+    /// <param name="decoupledFlow">decoupledFlow.</param>
+    /// <param name="cardPayment">cardPayment.</param>
+    public BankMetadataFeatures( BankMetadataFeaturesEnduringConsent? enduringConsent = null,
+        BankMetadataFeaturesDecoupledFlow? decoupledFlow = null,
+        BankmetadataFeaturesCardPayment? cardPayment = null)
     {
-        // to ensure "enduringConsent" is required (not null)
-        EnduringConsent = enduringConsent ??
-                          throw new BlinkInvalidValueException(
-                              "enduringConsent is a required property for BankMetadataFeatures and cannot be null");
-        // to ensure "decoupledFlow" is required (not null)
-        DecoupledFlow = decoupledFlow ??
-                        throw new BlinkInvalidValueException(
-                            "decoupledFlow is a required property for BankMetadataFeatures and cannot be null");
+        EnduringConsent = enduringConsent;
+        DecoupledFlow = decoupledFlow;
+        CardPayment = cardPayment;
     }
 
     /// <summary>
     /// Gets or Sets EnduringConsent
     /// </summary>
-    [DataMember(Name = "enduring_consent", IsRequired = false, EmitDefaultValue = true)]
-    public BankMetadataFeaturesEnduringConsent EnduringConsent { get; set; }
+    [DataMember(Name = "enduring_consent", EmitDefaultValue = false)]
+    public BankMetadataFeaturesEnduringConsent? EnduringConsent { get; set; }
 
     /// <summary>
     /// Gets or Sets DecoupledFlow
     /// </summary>
-    [DataMember(Name = "decoupled_flow", IsRequired = false, EmitDefaultValue = true)]
-    public BankMetadataFeaturesDecoupledFlow DecoupledFlow { get; set; }
+    [DataMember(Name = "decoupled_flow", EmitDefaultValue = false)]
+    public BankMetadataFeaturesDecoupledFlow? DecoupledFlow { get; set; }
+    
+    /// <summary>
+    /// Gets or Sets CardPayment
+    /// </summary>
+    [DataMember(Name="card_payment", EmitDefaultValue=false)]
+    public BankmetadataFeaturesCardPayment? CardPayment { get; set; }
 
     /// <summary>
     /// Returns the string presentation of the object
@@ -85,6 +86,7 @@ public class BankMetadataFeatures : IEquatable<BankMetadataFeatures>, IValidatab
         sb.Append("class BankMetadataFeatures {\n");
         sb.Append("  EnduringConsent: ").Append(EnduringConsent).Append('\n');
         sb.Append("  DecoupledFlow: ").Append(DecoupledFlow).Append('\n');
+        sb.Append("  CardPayment: ").Append(CardPayment).Append("\n");
         sb.Append("}\n");
         return sb.ToString();
     }
@@ -130,6 +132,11 @@ public class BankMetadataFeatures : IEquatable<BankMetadataFeatures>, IValidatab
                 DecoupledFlow == input.DecoupledFlow ||
                 (DecoupledFlow != null &&
                  DecoupledFlow.Equals(input.DecoupledFlow))
+            )&& 
+            (
+                CardPayment == input.CardPayment ||
+                (CardPayment != null &&
+                 CardPayment.Equals(input.CardPayment))
             );
     }
 
@@ -150,6 +157,11 @@ public class BankMetadataFeatures : IEquatable<BankMetadataFeatures>, IValidatab
             if (DecoupledFlow != null)
             {
                 hashCode = (hashCode * 59) + DecoupledFlow.GetHashCode();
+            }
+
+            if (CardPayment != null)
+            {
+                hashCode = (hashCode * 59) + CardPayment.GetHashCode();
             }
 
             return hashCode;

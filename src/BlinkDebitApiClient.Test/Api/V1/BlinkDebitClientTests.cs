@@ -79,7 +79,7 @@ public class BlinkDebitClientTests : IDisposable
     {
         var response = await _instance.GetMetaAsync(RequestHeaders);
         Assert.IsType<List<BankMetadata>>(response);
-        Assert.Equal(5, response.Count);
+        Assert.Equal(6, response.Count);
     }
 
     /// <summary>
@@ -595,7 +595,8 @@ public class BlinkDebitClientTests : IDisposable
             var paymentDetail = payment.Detail;
             Assert.NotNull(paymentDetail);
             Assert.Equal(quickPaymentId, paymentDetail.ConsentId);
-            Assert.Equal(Guid.Empty, paymentDetail.AccountReferenceId);
+            Assert.Null(paymentDetail.Pcr);
+            Assert.Null(paymentDetail.Amount);
         }
 
         Assert.NotNull(quickPaymentResponse.Consent.Detail);
@@ -715,7 +716,8 @@ public class BlinkDebitClientTests : IDisposable
             var paymentDetail = payment.Detail;
             Assert.NotNull(paymentDetail);
             Assert.Equal(quickPaymentId, paymentDetail.ConsentId);
-            Assert.Equal(Guid.Empty, paymentDetail.AccountReferenceId);
+            Assert.Null(paymentDetail.Pcr);
+            Assert.Equal(amount, paymentDetail.Amount);
         }
 
         Assert.NotNull(quickPaymentResponse.Consent.Detail);
@@ -894,8 +896,8 @@ public class BlinkDebitClientTests : IDisposable
         var paymentDetail = payment.Detail;
         Assert.NotNull(paymentDetail);
         Assert.Equal(consentId, paymentDetail.ConsentId);
-        Assert.Equal(Guid.Empty, paymentDetail.AccountReferenceId);
-        Assert.Null(paymentDetail.EnduringPayment);
+        Assert.Null(paymentDetail.Pcr);
+        Assert.Equal(amount, paymentDetail.Amount);
     }
 
     /// <summary>
@@ -1057,7 +1059,7 @@ public class BlinkDebitClientTests : IDisposable
         var paymentDetail = payment.Detail;
         Assert.NotNull(paymentDetail);
         Assert.Equal(consentId, paymentDetail.ConsentId);
-        Assert.Equal(Guid.Empty, paymentDetail.AccountReferenceId);
-        Assert.Null(paymentDetail.EnduringPayment);
+        Assert.Null(paymentDetail.Pcr);
+        Assert.Equal(amount, paymentDetail.Amount);
     }
 }

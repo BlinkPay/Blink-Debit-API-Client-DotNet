@@ -143,8 +143,8 @@ public class PaymentsApiTests : IDisposable
         var detail = payment.Detail;
         Assert.NotNull(detail);
         Assert.Equal(consentId, detail.ConsentId);
-        Assert.Equal(Guid.Empty, detail.AccountReferenceId);
-        Assert.Null(detail.EnduringPayment);
+        Assert.Null(detail.Pcr);
+        Assert.Equal(amount, detail.Amount);
     }
 
     /// <summary>
@@ -170,6 +170,9 @@ public class PaymentsApiTests : IDisposable
         Assert.True(string.IsNullOrEmpty(createConsentResponse.RedirectUri));
 
         var paymentId = Guid.Empty;
+        var pcr = new Pcr("particulars", "code", "reference");
+        var amount = new Amount("45.00", Amount.CurrencyEnum.NZD);
+        var paymentRequest = new PaymentRequest(consentId, pcr, amount);
         RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         for (var i = 1; i <= 10; i++)
         {
@@ -177,11 +180,6 @@ public class PaymentsApiTests : IDisposable
             try
             {
                 // create payment
-                var pcr = new Pcr("particulars", "code", "reference");
-                var amount = new Amount("45.00", Amount.CurrencyEnum.NZD);
-                var enduringPaymentRequest = new EnduringPaymentRequest(pcr, amount);
-                var paymentRequest = new PaymentRequest(consentId, enduringPaymentRequest);
-
                 var paymentResponse = await _instance.CreatePaymentAsync(RequestHeaders, paymentRequest);
 
                 Assert.NotNull(paymentResponse);
@@ -212,7 +210,7 @@ public class PaymentsApiTests : IDisposable
         var detail = payment.Detail;
         Assert.NotNull(detail);
         Assert.Equal(consentId, detail.ConsentId);
-        Assert.Equal(Guid.Empty, detail.AccountReferenceId);
-        Assert.NotNull(detail.EnduringPayment);
+        Assert.Equal(pcr, detail.Pcr);
+        Assert.Equal(amount, detail.Amount);
     }
 }

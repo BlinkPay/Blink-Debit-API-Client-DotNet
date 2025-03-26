@@ -109,8 +109,11 @@ public class Consent : IEquatable<Consent>, IValidatableObject
     /// <param name="detail">detail (required).</param>
     /// <param name="payments">Payments associated with this consent, if any. (required).</param>
     public Consent(Guid consentId = default(Guid), StatusEnum status = default(StatusEnum),
-        DateTimeOffset creationTimestamp = default(DateTimeOffset), DateTimeOffset statusUpdatedTimestamp = default(DateTimeOffset),
-        ConsentDetail detail = default(ConsentDetail), List<Payment> payments = default(List<Payment>))
+        DateTimeOffset creationTimestamp = default(DateTimeOffset),
+        DateTimeOffset statusUpdatedTimestamp = default(DateTimeOffset),
+        ConsentDetail detail = default(ConsentDetail),
+        List<Payment> payments = default(List<Payment>),
+        CardNetwork cardNetwork = default(CardNetwork))
     {
         ConsentId = consentId;
         Status = status;
@@ -123,6 +126,7 @@ public class Consent : IEquatable<Consent>, IValidatableObject
         Payments = payments ??
                    throw new BlinkInvalidValueException(
                        "payments is a required property for Consent and cannot be null");
+        CardNetwork = cardNetwork;
     }
 
     /// <summary>
@@ -153,27 +157,17 @@ public class Consent : IEquatable<Consent>, IValidatableObject
     public ConsentDetail Detail { get; set; }
 
     /// <summary>
-    /// If applicable, the Westpac account list for account selection. If this is included, the merchant is required to ask the customer which account they would like to debit the payment from using the information provided.
-    /// </summary>
-    /// <value>If applicable, the Westpac account list for account selection. If this is included, the merchant is required to ask the customer which account they would like to debit the payment from using the information provided.</value>
-    [DataMember(Name = "accounts", EmitDefaultValue = false)]
-    public List<Account> Accounts { get; private set; }
-
-    /// <summary>
-    /// Returns false as Accounts should not be serialized given that it's read-only.
-    /// </summary>
-    /// <returns>false (boolean)</returns>
-    public bool ShouldSerializeAccounts()
-    {
-        return false;
-    }
-
-    /// <summary>
     /// Payments associated with this consent, if any.
     /// </summary>
     /// <value>Payments associated with this consent, if any.</value>
     [DataMember(Name = "payments", IsRequired = true, EmitDefaultValue = true)]
     public List<Payment> Payments { get; set; }
+
+    /// <summary>
+    /// Gets or Sets CardNetwork
+    /// </summary>
+    [DataMember(Name="card_network", EmitDefaultValue=false)]
+    public CardNetwork CardNetwork { get; set; }
 
     /// <summary>
     /// Returns the string presentation of the object
@@ -188,8 +182,8 @@ public class Consent : IEquatable<Consent>, IValidatableObject
         sb.Append("  CreationTimestamp: ").Append(CreationTimestamp).Append('\n');
         sb.Append("  StatusUpdatedTimestamp: ").Append(StatusUpdatedTimestamp).Append('\n');
         sb.Append("  Detail: ").Append(Detail).Append('\n');
-        sb.Append("  Accounts: ").Append(Accounts).Append('\n');
         sb.Append("  Payments: ").Append(Payments).Append('\n');
+        sb.Append("  CardNetwork: ").Append(CardNetwork).Append("\n");
         sb.Append("}\n");
         return sb.ToString();
     }
@@ -251,16 +245,15 @@ public class Consent : IEquatable<Consent>, IValidatableObject
                  Detail.Equals(input.Detail))
             ) &&
             (
-                Accounts == input.Accounts ||
-                Accounts != null &&
-                input.Accounts != null &&
-                Accounts.SequenceEqual(input.Accounts)
-            ) &&
-            (
                 Payments == input.Payments ||
                 Payments != null &&
                 input.Payments != null &&
                 Payments.SequenceEqual(input.Payments)
+            ) && 
+            (
+                CardNetwork == input.CardNetwork ||
+                (CardNetwork != null &&
+                 CardNetwork.Equals(input.CardNetwork))
             );
     }
 
@@ -294,14 +287,14 @@ public class Consent : IEquatable<Consent>, IValidatableObject
                 hashCode = (hashCode * 59) + Detail.GetHashCode();
             }
 
-            if (Accounts != null)
-            {
-                hashCode = (hashCode * 59) + Accounts.GetHashCode();
-            }
-
             if (Payments != null)
             {
                 hashCode = (hashCode * 59) + Payments.GetHashCode();
+            }
+
+            if (CardNetwork != null)
+            {
+                hashCode = (hashCode * 59) + CardNetwork.GetHashCode();
             }
 
             return hashCode;
