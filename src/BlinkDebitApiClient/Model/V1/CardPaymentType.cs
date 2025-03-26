@@ -27,44 +27,29 @@ using Newtonsoft.Json.Converters;
 namespace BlinkDebitApiClient.Model.V1;
 
 /// <summary>
-/// The bank name. Required if not using Blink&#39;s hosted gateway.
+/// The type of card payment.
 /// </summary>
-/// <value>The bank name. Required if not using Blink&#39;s hosted gateway.</value>
+/// <value>The type of card payment.</value>
 [JsonConverter(typeof(StringEnumConverter))]
-public enum Bank
+public enum CardPaymentType
 {
     /// <summary>
-    /// Enum ASB for value: ASB
+    /// Enum APPLEPAY for value: APPLEPAY
     /// </summary>
-    [EnumMember(Value = "ASB")] ASB = 1,
+    [EnumMember(Value = "APPLEPAY")] APPLEPAY = 1,
 
     /// <summary>
-    /// Enum ANZ for value: ANZ
+    /// Enum CLICKTOPAY for value: CLICKTOPAY
     /// </summary>
-    [EnumMember(Value = "ANZ")] ANZ = 2,
+    [EnumMember(Value = "CLICKTOPAY")] CLICKTOPAY = 2,
 
     /// <summary>
-    /// Enum BNZ for value: BNZ
+    /// Enum GOOGLEPAY for value: GOOGLEPAY
     /// </summary>
-    [EnumMember(Value = "BNZ")] BNZ = 3,
+    [EnumMember(Value = "GOOGLEPAY")] GOOGLEPAY = 3,
 
     /// <summary>
-    /// Enum Westpac for value: Westpac
+    /// Enum PANENTRY for value: PANENTRY
     /// </summary>
-    [EnumMember(Value = "Westpac")] Westpac = 4,
-
-    /// <summary>
-    /// Enum KiwiBank for value: KiwiBank
-    /// </summary>
-    [EnumMember(Value = "KiwiBank")] KiwiBank = 5,
-
-    /// <summary>
-    /// Enum PNZ for value: PNZ
-    /// </summary>
-    [EnumMember(Value = "PNZ")] PNZ = 6,
-    
-    /// <summary>
-    /// Enum Cybersource for value: Cybersource
-    /// </summary>
-    [EnumMember(Value = "Cybersource")] Cybersource = 7
+    [EnumMember(Value = "PANENTRY")] PANENTRY = 4
 }

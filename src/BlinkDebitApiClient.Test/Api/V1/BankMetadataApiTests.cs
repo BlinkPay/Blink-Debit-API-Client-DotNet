@@ -72,6 +72,6 @@ public class BankMetadataApiTests : IDisposable
     {
         var response = await _instance.GetMetaAsync(RequestHeaders);
         Assert.IsType<List<BankMetadata>>(response);
-        Assert.Equal(5, response.Count);
+        Assert.Equal(6, response.Count);
     }
 }

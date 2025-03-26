@@ -473,8 +473,7 @@ If you already have an approved consent, you can run a Payment against that cons
 ```csharp
 var pcr = new Pcr(particulars, code, reference);
 var amount = new Amount(total, Amount.CurrencyEnum.NZD);
-var enduringPaymentRequest = new EnduringPaymentRequest(pcr, amount);
-var paymentRequest = new PaymentRequest(consentId, enduringPaymentRequest);
+var paymentRequest = new PaymentRequest(consentId, pcr, amount);
 
 var paymentResponse = client.CreatePayment(request);
 ```

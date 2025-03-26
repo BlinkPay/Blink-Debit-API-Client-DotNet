@@ -47,15 +47,15 @@ public class PaymentRequest : IEquatable<PaymentRequest>, IValidatableObject
     /// Initializes a new instance of the <see cref="PaymentRequest" /> class.
     /// </summary>
     /// <param name="consentId">The consent ID (required).</param>
-    /// <param name="enduringPayment">enduringPayment.</param>
-    /// <param name="accountReferenceId">The account reference ID from account list. This is required if the account selection information was provided to you on the consents endpoint..</param>
+    /// <param name="pcr">pcr.</param>
+    /// <param name="amount">amount.</param>
     public PaymentRequest(Guid consentId = default(Guid),
-        EnduringPaymentRequest enduringPayment = default(EnduringPaymentRequest),
-        Guid accountReferenceId = default(Guid))
+        Pcr pcr = default(Pcr),
+        Amount amount = default(Amount))
     {
         ConsentId = consentId;
-        EnduringPayment = enduringPayment;
-        AccountReferenceId = accountReferenceId;
+        Pcr = pcr;
+        Amount = amount;
     }
 
     /// <summary>
@@ -66,17 +66,16 @@ public class PaymentRequest : IEquatable<PaymentRequest>, IValidatableObject
     public Guid ConsentId { get; set; }
 
     /// <summary>
-    /// Gets or Sets EnduringPayment
+    /// Gets or Sets Pcr
     /// </summary>
-    [DataMember(Name = "enduring_payment", EmitDefaultValue = false)]
-    public EnduringPaymentRequest EnduringPayment { get; set; }
+    [DataMember(Name="pcr", EmitDefaultValue=false)]
+    public Pcr Pcr { get; set; }
 
     /// <summary>
-    /// The account reference ID from account list. This is required if the account selection information was provided to you on the consents endpoint.
+    /// Gets or Sets Amount
     /// </summary>
-    /// <value>The account reference ID from account list. This is required if the account selection information was provided to you on the consents endpoint.</value>
-    [DataMember(Name = "account_reference_id", EmitDefaultValue = false)]
-    public Guid AccountReferenceId { get; set; }
+    [DataMember(Name="amount", EmitDefaultValue=false)]
+    public Amount Amount { get; set; }
 
     /// <summary>
     /// Returns the string presentation of the object
@@ -87,8 +86,8 @@ public class PaymentRequest : IEquatable<PaymentRequest>, IValidatableObject
         var sb = new StringBuilder();
         sb.Append("class PaymentRequest {\n");
         sb.Append("  ConsentId: ").Append(ConsentId).Append('\n');
-        sb.Append("  EnduringPayment: ").Append(EnduringPayment).Append('\n');
-        sb.Append("  AccountReferenceId: ").Append(AccountReferenceId).Append('\n');
+        sb.Append("  Pcr: ").Append(Pcr).Append("\n");
+        sb.Append("  Amount: ").Append(Amount).Append("\n");
         sb.Append("}\n");
         return sb.ToString();
     }
@@ -131,14 +130,14 @@ public class PaymentRequest : IEquatable<PaymentRequest>, IValidatableObject
                  ConsentId.Equals(input.ConsentId))
             ) &&
             (
-                EnduringPayment == input.EnduringPayment ||
-                (EnduringPayment != null &&
-                 EnduringPayment.Equals(input.EnduringPayment))
-            ) &&
+                Pcr == input.Pcr ||
+                (Pcr != null &&
+                 Pcr.Equals(input.Pcr))
+            ) && 
             (
-                AccountReferenceId == input.AccountReferenceId ||
-                (AccountReferenceId != null &&
-                 AccountReferenceId.Equals(input.AccountReferenceId))
+                Amount == input.Amount ||
+                (Amount != null &&
+                 Amount.Equals(input.Amount))
             );
     }
 
@@ -156,14 +155,14 @@ public class PaymentRequest : IEquatable<PaymentRequest>, IValidatableObject
                 hashCode = (hashCode * 59) + ConsentId.GetHashCode();
             }
 
-            if (EnduringPayment != null)
+            if (Pcr != null)
             {
-                hashCode = (hashCode * 59) + EnduringPayment.GetHashCode();
+                hashCode = (hashCode * 59) + Pcr.GetHashCode();
             }
 
-            if (AccountReferenceId != null)
+            if (Amount != null)
             {
-                hashCode = (hashCode * 59) + AccountReferenceId.GetHashCode();
+                hashCode = (hashCode * 59) + Amount.GetHashCode();
             }
 
             return hashCode;

@@ -189,8 +189,7 @@ public class RefundsApiTests : IDisposable
             {
                 var pcr = new Pcr("particulars", "code", "reference");
                 var amount = new Amount("45.00", Amount.CurrencyEnum.NZD);
-                var enduringPaymentRequest = new EnduringPaymentRequest(pcr, amount);
-                var paymentRequest = new PaymentRequest(consentId, enduringPaymentRequest);
+                var paymentRequest = new PaymentRequest(consentId, pcr, amount);
 
                 var paymentResponse = await _paymentsApi.CreatePaymentAsync(RequestHeaders, paymentRequest);
 

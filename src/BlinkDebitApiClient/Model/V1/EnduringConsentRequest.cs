@@ -55,10 +55,9 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
     /// <param name="hashedCustomerIdentifier">The hashed unique ID of the customer e.g. customer internal ID. SHA-256 is recommended..</param>
     /// <param name="type">Whether the consent is single or enduring. (required).</param>
     public EnduringConsentRequest(AuthFlow flow = default(AuthFlow),
-        DateTimeOffset fromTimestamp = default(DateTimeOffset),
-        DateTimeOffset expiryTimestamp = default(DateTimeOffset), Period period = default(Period),
-        Amount maximumAmountPeriod = default(Amount), string hashedCustomerIdentifier = default(string),
-        TypeEnum type = TypeEnum.Enduring) : base()
+        DateTimeOffset fromTimestamp = default(DateTimeOffset), DateTimeOffset? expiryTimestamp = null,
+        Period period = default(Period), Amount maximumAmountPeriod = default(Amount),
+        string hashedCustomerIdentifier = default(string), TypeEnum type = TypeEnum.Enduring) : base()
     {
         // to ensure "flow" is required (not null)
         Flow = flow ?? throw new BlinkInvalidValueException(
@@ -93,7 +92,7 @@ public class EnduringConsentRequest : ConsentDetail, IEquatable<EnduringConsentR
     /// <value>The ISO 8601 timeout for when an enduring consent will expire. If this field is blank, an indefinite request will be attempted.</value>
     /// <example>&quot;2021-12-01T00:00+13:00&quot;</example>
     [DataMember(Name = "expiry_timestamp", EmitDefaultValue = false)]
-    public DateTimeOffset ExpiryTimestamp { get; set; }
+    public DateTimeOffset? ExpiryTimestamp { get; set; }
 
     /// <summary>
     /// Gets or Sets MaximumAmountPeriod

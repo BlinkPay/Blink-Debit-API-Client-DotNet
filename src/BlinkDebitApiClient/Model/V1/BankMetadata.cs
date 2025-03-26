@@ -37,12 +37,6 @@ namespace BlinkDebitApiClient.Model.V1;
 public class BankMetadata : IEquatable<BankMetadata>, IValidatableObject
 {
     /// <summary>
-    /// Gets or Sets Name
-    /// </summary>
-    [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = true)]
-    public Bank Name { get; set; }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="BankMetadata" /> class.
     /// </summary>
     [JsonConstructorAttribute]
@@ -54,21 +48,32 @@ public class BankMetadata : IEquatable<BankMetadata>, IValidatableObject
     /// Initializes a new instance of the <see cref="BankMetadata" /> class.
     /// </summary>
     /// <param name="name">name (required).</param>
+    /// <param name="paymentLimit">paymentLimit.</param>
     /// <param name="features">features (required).</param>
-    /// <param name="redirectFlow">redirectFlow (required).</param>
-    public BankMetadata(Bank name = default(Bank), BankMetadataFeatures features = default(BankMetadataFeatures),
-        BankMetadataRedirectFlow redirectFlow = default(BankMetadataRedirectFlow))
+    /// <param name="redirectFlow">redirectFlow.</param>
+    public BankMetadata(Bank name = default(Bank), Amount? paymentLimit = null,
+        BankMetadataFeatures features = default(BankMetadataFeatures), BankMetadataRedirectFlow? redirectFlow = null)
     {
         Name = name;
+        PaymentLimit = paymentLimit;
         // to ensure "features" is required (not null)
         Features = features ??
                    throw new BlinkInvalidValueException(
                        "features is a required property for BankMetadata and cannot be null");
-        // to ensure "redirectFlow" is required (not null)
-        RedirectFlow = redirectFlow ??
-                       throw new BlinkInvalidValueException(
-                           "redirectFlow is a required property for BankMetadata and cannot be null");
+        RedirectFlow = redirectFlow;
     }
+    
+    /// <summary>
+    /// Gets or Sets Name
+    /// </summary>
+    [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = true)]
+    public Bank Name { get; set; }
+
+    /// <summary>
+    /// Gets or Sets PaymentLimit
+    /// </summary>
+    [DataMember(Name="payment_limit", EmitDefaultValue=false)]
+    public Amount? PaymentLimit { get; set; }
 
     /// <summary>
     /// Gets or Sets Features
@@ -79,8 +84,8 @@ public class BankMetadata : IEquatable<BankMetadata>, IValidatableObject
     /// <summary>
     /// Gets or Sets RedirectFlow
     /// </summary>
-    [DataMember(Name = "redirect_flow", IsRequired = true, EmitDefaultValue = true)]
-    public BankMetadataRedirectFlow RedirectFlow { get; set; }
+    [DataMember(Name = "redirect_flow", EmitDefaultValue = false)]
+    public BankMetadataRedirectFlow? RedirectFlow { get; set; }
 
     /// <summary>
     /// Returns the string presentation of the object
@@ -91,6 +96,7 @@ public class BankMetadata : IEquatable<BankMetadata>, IValidatableObject
         var sb = new StringBuilder();
         sb.Append("class BankMetadata {\n");
         sb.Append("  Name: ").Append(Name).Append('\n');
+        sb.Append("  PaymentLimit: ").Append(PaymentLimit).Append("\n");
         sb.Append("  Features: ").Append(Features).Append('\n');
         sb.Append("  RedirectFlow: ").Append(RedirectFlow).Append('\n');
         sb.Append("}\n");
@@ -132,6 +138,11 @@ public class BankMetadata : IEquatable<BankMetadata>, IValidatableObject
             (
                 Name == input.Name ||
                 Name.Equals(input.Name)
+            ) && 
+            (
+                PaymentLimit == input.PaymentLimit ||
+                (PaymentLimit != null &&
+                 PaymentLimit.Equals(input.PaymentLimit))
             ) &&
             (
                 Features == input.Features ||
@@ -155,6 +166,11 @@ public class BankMetadata : IEquatable<BankMetadata>, IValidatableObject
         {
             var hashCode = 41;
             hashCode = (hashCode * 59) + Name.GetHashCode();
+            if (PaymentLimit != null)
+            {
+                hashCode = (hashCode * 59) + PaymentLimit.GetHashCode();
+            }
+            
             if (Features != null)
             {
                 hashCode = (hashCode * 59) + Features.GetHashCode();
