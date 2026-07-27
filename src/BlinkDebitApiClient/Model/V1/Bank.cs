@@ -64,7 +64,12 @@ public enum Bank
     [EnumMember(Value = "PNZ")] PNZ = 6,
     
     /// <summary>
-    /// Enum Cybersource for value: Cybersource
+    /// Enum Card for value: Card
     /// </summary>
-    [EnumMember(Value = "Cybersource")] Cybersource = 7
+    [EnumMember(Value = "Card")] Card = 7,
+
+    /// <summary>
+    /// Enum NZHL for value: NZHL
+    /// </summary>
+    [EnumMember(Value = "NZHL")] NZHL = 8
 }

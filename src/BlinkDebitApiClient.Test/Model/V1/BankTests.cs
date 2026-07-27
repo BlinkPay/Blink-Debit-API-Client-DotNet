@@ -39,8 +39,9 @@ public class BankTests
     [InlineData(Bank.BNZ, "BNZ")]
     [InlineData(Bank.Westpac, "Westpac")]
     [InlineData(Bank.KiwiBank, "Kiwibank")]
+    [InlineData(Bank.NZHL, "NZHL")]
     [InlineData(Bank.PNZ, "PNZ")]
-    [InlineData(Bank.Cybersource, "Cybersource")]
+    [InlineData(Bank.Card, "Card")]
     public void SerialisesToExpectedWireValue(Bank bank, string expectedWireValue)
     {
         var json = JsonConvert.SerializeObject(bank);
@@ -54,8 +55,9 @@ public class BankTests
     [InlineData("BNZ", Bank.BNZ)]
     [InlineData("Westpac", Bank.Westpac)]
     [InlineData("Kiwibank", Bank.KiwiBank)]
+    [InlineData("NZHL", Bank.NZHL)]
     [InlineData("PNZ", Bank.PNZ)]
-    [InlineData("Cybersource", Bank.Cybersource)]
+    [InlineData("Card", Bank.Card)]
     public void DeserialisesFromExpectedWireValue(string wireValue, Bank expectedBank)
     {
         var bank = JsonConvert.DeserializeObject<Bank>($"\"{wireValue}\"");
