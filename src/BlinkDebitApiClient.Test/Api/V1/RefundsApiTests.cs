@@ -134,9 +134,11 @@ public class RefundsApiTests : IDisposable
 
         Assert.NotEqual(Guid.Empty, paymentId);
 
-        // create account number refund
+        // create account number refund - a distinct operation from the payment above, so it needs its own
+        // idempotency key; reusing the payment's key with a different payload is rejected with HTTP 409
         var refundRequest = new AccountNumberRefundRequest(paymentId);
 
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         var refundResponse = await _instance.CreateRefundAsync(RequestHeaders, refundRequest);
 
         Assert.NotNull(refundResponse);
@@ -208,9 +210,11 @@ public class RefundsApiTests : IDisposable
 
         Assert.NotEqual(Guid.Empty, paymentId);
 
-        // create account number refund
+        // create account number refund - a distinct operation from the payment above, so it needs its own
+        // idempotency key; reusing the payment's key with a different payload is rejected with HTTP 409
         var refundRequest = new AccountNumberRefundRequest(paymentId);
 
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         var refundResponse = await _instance.CreateRefundAsync(RequestHeaders, refundRequest);
 
         Assert.NotNull(refundResponse);
@@ -281,9 +285,11 @@ public class RefundsApiTests : IDisposable
 
         Assert.NotEqual(Guid.Empty, paymentId);
 
-        // create full refund
+        // create full refund - a distinct operation from the payment above, so it needs its own
+        // idempotency key; reusing the payment's key with a different payload is rejected with HTTP 409
         var refundRequest = new FullRefundRequest(paymentId, pcr, CallbackUrl);
 
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         try
         {
             await _instance.CreateRefundAsync(RequestHeaders, refundRequest);
@@ -345,10 +351,12 @@ public class RefundsApiTests : IDisposable
 
         Assert.NotEqual(Guid.Empty, paymentId);
 
-        // create partial refund
+        // create partial refund - a distinct operation from the payment above, so it needs its own
+        // idempotency key; reusing the payment's key with a different payload is rejected with HTTP 409
         amount = new Amount("25.00", Amount.CurrencyEnum.NZD);
         var refundRequest = new PartialRefundRequest(paymentId, amount, pcr, CallbackUrl);
 
+        RequestHeaders[BlinkDebitConstant.IDEMPOTENCY_KEY.GetValue()] = Guid.NewGuid().ToString();
         try
         {
             await _instance.CreateRefundAsync(RequestHeaders, refundRequest);

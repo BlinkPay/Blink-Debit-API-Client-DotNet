@@ -54,9 +54,9 @@ public enum Bank
     [EnumMember(Value = "Westpac")] Westpac = 4,
 
     /// <summary>
-    /// Enum KiwiBank for value: Kiwibank
+    /// Enum Kiwibank for value: Kiwibank
     /// </summary>
-    [EnumMember(Value = "Kiwibank")] KiwiBank = 5,
+    [EnumMember(Value = "Kiwibank")] Kiwibank = 5,
 
     /// <summary>
     /// Enum PNZ for value: PNZ
