@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BlinkDebitApiClient.Api.V1;
 using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
@@ -74,7 +75,7 @@ public class EnduringConsentsApiTests : IDisposable
     /// Verify that enduring consent with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that enduring consent with redirect flow is created, retrieved and revoked in PNZ")]
-    public async void EnduringConsentWithRedirectFlowInPnz()
+    public async Task EnduringConsentWithRedirectFlowInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -162,7 +163,7 @@ public class EnduringConsentsApiTests : IDisposable
     /// </summary>
     [Fact(DisplayName = "Verify that rejected enduring consent with redirect flow is retrieved from PNZ",
         Skip = "Disabled temporarily until a new rejected consent ID is supplied")]
-    public async void GetRejectedEnduringConsentWithRedirectFlowFromPnz()
+    public async Task GetRejectedEnduringConsentWithRedirectFlowFromPnz()
     {
         var consent = await _instance.GetEnduringConsentAsync(Guid.Parse("f0b5fc9e-afa2-441f-a9e7-e2131952b835"));
 
@@ -189,7 +190,7 @@ public class EnduringConsentsApiTests : IDisposable
     /// Verify that enduring consent with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that enduring consent with decoupled flow is created, retrieved and revoked in PNZ")]
-    public async void EnduringConsentWithDecoupledFlowInPnz()
+    public async Task EnduringConsentWithDecoupledFlowInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933",
@@ -277,7 +278,7 @@ public class EnduringConsentsApiTests : IDisposable
     /// Verify that enduring consent with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that enduring consent with redirect flow is created, retrieved and revoked in PNZ")]
-    public async void EnduringConsentWithGatewayFlowAndRedirectFlowHintInPnz()
+    public async Task EnduringConsentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -370,7 +371,7 @@ public class EnduringConsentsApiTests : IDisposable
     /// Verify that enduring consent with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that enduring consent with redirect flow is created, retrieved and revoked in PNZ")]
-    public async void EnduringConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
+    public async Task EnduringConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);

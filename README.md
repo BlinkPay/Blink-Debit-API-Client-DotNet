@@ -8,14 +8,15 @@
 # Table of Contents
 1. [Introduction](#introduction)
 2. [Contributing](#contributing)
-3. [Minimum Requirements](#minimum-requirements)
-4. [Dependency](#adding-the-dependency)
-5. [Quick Start](#quick-start)
-6. [Configuration](#configuration)
-7. [Client Creation](#client-creation)
-8. [Request ID, Correlation ID and Idempotency Key](#request-id-correlation-id-and-idempotency-key)
-9. [Full Examples](#full-examples)
-10. [Individual API Call Examples](#individual-api-call-examples)
+3. [Building and Testing Locally](#building-and-testing-locally)
+4. [Minimum Requirements](#minimum-requirements)
+5. [Dependency](#adding-the-dependency)
+6. [Quick Start](#quick-start)
+7. [Configuration](#configuration)
+8. [Client Creation](#client-creation)
+9. [Request ID, Correlation ID and Idempotency Key](#request-id-correlation-id-and-idempotency-key)
+10. [Full Examples](#full-examples)
+11. [Individual API Call Examples](#individual-api-call-examples)
 
 ## Introduction
 This SDK allows merchants with .NET 8-based e-commerce sites to seamlessly integrate with Blink PayNow and Blink AutoPay in order to accept digital payments.
@@ -26,6 +27,42 @@ This SDK is written in C# 12.
 We welcome contributions from the community. Your pull request will be reviewed by our team.
 
 This project is licensed under the MIT License.
+
+## Building and Testing Locally
+
+### Prerequisites
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or higher (check with `dotnet --version`)
+
+### Compile
+From the repository root:
+```bash
+dotnet restore
+dotnet build --configuration Release
+```
+
+### Test
+Most tests are integration tests that call the real sandbox API, so sandbox OAuth credentials must be set as environment variables first:
+```bash
+export BLINKPAY_CLIENT_ID="your-sandbox-client-id"
+export BLINKPAY_CLIENT_SECRET="your-sandbox-client-secret"
+```
+
+Then run:
+```bash
+# Full suite
+dotnet test
+
+# With detailed output
+dotnet test --logger "console;verbosity=detailed"
+
+# A specific test class
+dotnet test --filter "FullyQualifiedName~QuickPaymentsApiTests"
+
+# Only the dependency injection extension tests (no credentials required)
+dotnet test src/BlinkDebitApiClient.Extensions.DependencyInjection.Test
+```
+
+Some tests are marked `Skip` because they require manual user authorisation in a browser — these are expected to be skipped.
 
 ## Minimum Requirements
 - .NET 8 or higher

@@ -544,7 +544,7 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
         {
             ClientCertificates = configuration.ClientCertificates,
             CookieContainer = cookies,
-            MaxTimeout = configuration.Timeout,
+            Timeout = TimeSpan.FromMilliseconds(configuration.Timeout),
             Proxy = configuration.Proxy,
             UserAgent = configuration.UserAgent,
             Authenticator = configuration.Authenticator
@@ -643,7 +643,7 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
         var clientOptions = new RestClientOptions(baseUrl)
         {
             ClientCertificates = configuration.ClientCertificates,
-            MaxTimeout = configuration.Timeout,
+            Timeout = TimeSpan.FromMilliseconds(configuration.Timeout),
             Proxy = configuration.Proxy,
             UserAgent = configuration.UserAgent,
             Authenticator = configuration.Authenticator

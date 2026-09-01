@@ -83,7 +83,7 @@ public class PaymentsApiTests : IDisposable
     /// Verify that payment for single consent with decoupled flow is created and retrieved
     /// </summary>
     [Fact(DisplayName = "Verify that payment for single consent with decoupled flow is created and retrieved")]
-    public async void CreatePaymentForSingleConsentWithDecoupledFlow()
+    public async Task CreatePaymentForSingleConsentWithDecoupledFlow()
     {
         // create single consent with decoupled flow
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -151,7 +151,7 @@ public class PaymentsApiTests : IDisposable
     /// Verify that payment for enduring consent with decoupled flow is created and retrieved
     /// </summary>
     [Fact(DisplayName = "Verify that payment for enduring consent with decoupled flow is created and retrieved")]
-    public async void CreatePaymentForEnduringConsentWithDecoupledFlow()
+    public async Task CreatePaymentForEnduringConsentWithDecoupledFlow()
     {
         // create enduring consent with decoupled flow
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);

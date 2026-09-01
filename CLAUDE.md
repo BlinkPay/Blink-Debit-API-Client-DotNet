@@ -1,6 +1,6 @@
 # CLAUDE.md - BlinkPay .NET SDK Code Knowledge
 
-**Last Updated**: 2025-11-17
+**Last Updated**: 2026-09-01
 **Project**: Blink Debit API Client .NET SDK v1.5.0+
 **Framework**: .NET 8.0, C# 12
 
@@ -140,6 +140,7 @@ var response = await client.ExecuteAsync(request);
 - Use `using` statements for deterministic disposal
 - Each API call creates a new RestClient (follows RestSharp best practices)
 - Connection pooling handled by HttpClient internally
+- RestSharp 111+ replaced `RestClientOptions.MaxTimeout` (int, ms) with `Timeout` (`TimeSpan?`) — the SDK's `Configuration.Timeout` remains an int in milliseconds, converted via `TimeSpan.FromMilliseconds()` in `ApiClient.cs`
 
 ---
 
@@ -613,7 +614,7 @@ public class SomeApiTests : IDisposable
     }
 
     [Fact(DisplayName = "Human-readable test description")]
-    public async void TestMethod()
+    public async Task TestMethod() // Always async Task, never async void (xUnit1048)
     {
         // Arrange
         var request = new SomeRequest(...);
