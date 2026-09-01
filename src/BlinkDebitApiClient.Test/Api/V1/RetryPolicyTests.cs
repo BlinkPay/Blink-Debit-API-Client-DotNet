@@ -20,11 +20,13 @@
  * SOFTWARE.
  */
 
+using System;
 using System.Threading.Tasks;
 using BlinkDebitApiClient.Api.V1;
 using BlinkDebitApiClient.Config;
 using BlinkDebitApiClient.Exceptions;
 using Microsoft.Extensions.Logging;
+using Polly;
 using RestSharp;
 using Xunit;
 
@@ -32,19 +34,46 @@ namespace BlinkDebitApiClient.Test.Api.V1;
 
 /// <summary>
 /// Unit tests for the Polly retry policies that <see cref="BlinkDebitClient"/> installs.
-/// These join the integration collection because <see cref="RetryConfiguration"/> holds the
-/// policies in static state, and running in a separate collection would race against it.
+/// <para>
+/// <see cref="RetryConfiguration"/> holds the policies in process-wide static state, and
+/// <see cref="ApiClient"/> switches to its retry branch for every request once they are set.
+/// Installing them therefore changes how every other test in the assembly executes, so this
+/// class snapshots the policies on construction and restores them in <see cref="Dispose"/>.
+/// Joining the integration collection additionally stops other tests running concurrently
+/// while the policies are swapped in; the collection alone would not be enough, because
+/// xUnit does not guarantee the order of classes within it.
+/// </para>
 /// </summary>
 [Collection("Blink Debit Collection")]
-public class RetryPolicyTests
+public class RetryPolicyTests : IDisposable
 {
+    private readonly Policy<RestResponse> _originalRetryPolicy;
+
+    private readonly AsyncPolicy<RestResponse> _originalAsyncRetryPolicy;
+
     public RetryPolicyTests()
     {
-        // Constructing the client with retry enabled installs the policies. The constructor
-        // only validates its arguments, so no request is made and the credentials are unused.
+        _originalRetryPolicy = RetryConfiguration.RetryPolicy;
+        _originalAsyncRetryPolicy = RetryConfiguration.AsyncRetryPolicy;
+
+        // ConfigureRetry is private, so constructing the client is the only way to exercise the
+        // real policy configuration rather than a copy of it. The constructor validates its
+        // arguments, builds an ApiClient and its OAuth authenticator, and installs the policies;
+        // it issues no request, so these placeholder credentials are never sent anywhere.
         _ = new BlinkDebitClient(
             LoggerFactory.Create(builder => builder.AddDebug()).CreateLogger<RetryPolicyTests>(),
             "https://sandbox.debit.blinkpay.co.nz", "test-client-id", "test-client-secret", 10000, true);
+    }
+
+    /// <summary>
+    /// Restores the policies installed before this class ran, so that the integration tests
+    /// sharing this collection keep the retry behaviour their own fixture configured.
+    /// </summary>
+    public void Dispose()
+    {
+        RetryConfiguration.RetryPolicy = _originalRetryPolicy;
+        RetryConfiguration.AsyncRetryPolicy = _originalAsyncRetryPolicy;
+        GC.SuppressFinalize(this);
     }
 
     [Fact(DisplayName = "The synchronous policy retries a retryable failure and then succeeds")]

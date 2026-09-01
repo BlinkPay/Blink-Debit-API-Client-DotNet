@@ -74,7 +74,8 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
       - name: Test
-        run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage;Format=opencover" /p:WarningLevel=0
+        # Reuses the Release output above, so coverage is measured against the binaries Sonar analysed
+        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage;Format=opencover" /p:WarningLevel=0
         env:
           BLINKPAY_CLIENT_ID: ${{ vars.CLIENT_ID }}
           BLINKPAY_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
