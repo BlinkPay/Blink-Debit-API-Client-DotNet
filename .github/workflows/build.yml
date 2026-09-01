@@ -11,9 +11,9 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
 
@@ -21,16 +21,16 @@ jobs:
     needs: setup
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Cache SonarCloud packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -40,7 +40,7 @@ jobs:
     needs: cache
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Restore NuGet packages
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
@@ -58,23 +58,23 @@ jobs:
     needs: snyk
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install SonarScanner
         run: dotnet tool install --global dotnet-sonarscanner
       - name: Restore NuGet packages
         run: dotnet restore
       - name: Run Sonar on blink-debit-api-client-dotnet to inspect code
         run: |
-          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           dotnet build --configuration Release --no-restore /p:WarningLevel=0
-          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         continue-on-error: true
 
   restore_build_test:
     needs: sonar
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
