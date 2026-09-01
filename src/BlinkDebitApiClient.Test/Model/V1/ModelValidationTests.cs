@@ -35,7 +35,7 @@ namespace BlinkDebitApiClient.Test.Model.V1;
 /// </summary>
 public class ModelValidationTests
 {
-    private static IList<ValidationResult> Validate(object model)
+    private static List<ValidationResult> Validate(object model)
     {
         var results = new List<ValidationResult>();
         Validator.TryValidateObject(model, new ValidationContext(model), results, true);
