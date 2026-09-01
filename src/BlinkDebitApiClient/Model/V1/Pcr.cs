@@ -177,19 +177,19 @@ public class Pcr : IEquatable<Pcr>, IValidatableObject
     /// Compiled regex pattern for validating Particulars.
     /// </summary>
     private static readonly Regex RegexParticulars = new Regex(@"[a-zA-Z0-9- &#\?:_\/,\.']{1,12}",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
 
     /// <summary>
     /// Compiled regex pattern for validating Code.
     /// </summary>
     private static readonly Regex RegexCode = new Regex(@"[a-zA-Z0-9- &#\?:_\/,\.']{0,12}",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
 
     /// <summary>
     /// Compiled regex pattern for validating Reference.
     /// </summary>
     private static readonly Regex RegexReference = new Regex(@"[a-zA-Z0-9- &#\?:_\/,\.']{0,12}",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
 
     /// <summary>
     /// To validate all properties of the instance

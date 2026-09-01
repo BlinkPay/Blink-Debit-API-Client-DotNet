@@ -169,7 +169,7 @@ public class Amount : IEquatable<Amount>, IValidatableObject
     /// Compiled regex pattern for validating the Total amount format.
     /// </summary>
     private static readonly Regex RegexTotal = new Regex(@"^\d{1,13}\.\d{1,2}$",
-        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
 
     /// <summary>
     /// To validate all properties of the instance

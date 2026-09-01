@@ -266,7 +266,8 @@ public class Refund : IEquatable<Refund>, IValidatableObject
     IEnumerable<ValidationResult> IValidatableObject.Validate(ValidationContext validationContext)
     {
         // AccountNumber (string) pattern
-        var regexAccountNumber = new Regex(@"^\d{2}-\d{4}-\d{7}-\d{2}$", RegexOptions.CultureInvariant);
+        var regexAccountNumber = new Regex(@"^\d{2}-\d{4}-\d{7}-\d{2}$", RegexOptions.CultureInvariant,
+            TimeSpan.FromSeconds(1));
         if (false == regexAccountNumber.Match(AccountNumber).Success)
         {
             yield return new ValidationResult(

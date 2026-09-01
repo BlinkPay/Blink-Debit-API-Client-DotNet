@@ -168,7 +168,14 @@ public class Configuration : IReadableConfiguration
     private IDictionary<string, string> _apiKeyPrefix;
 
     private string _dateTimeFormat = ISO8601_DATETIME_FORMAT;
-    private string _tempFolderPath = Path.GetTempPath();
+    private string _tempFolderPath = DefaultTempFolderPath.Value;
+
+    /// <summary>
+    /// Uniquely named temporary folder restricted to the current user, shared across the process,
+    /// used instead of the publicly writable system temporary folder.
+    /// </summary>
+    private static readonly Lazy<string> DefaultTempFolderPath = new Lazy<string>(() =>
+        Directory.CreateTempSubdirectory("blinkdebit").FullName + Path.DirectorySeparatorChar);
 
     /// <summary>
     /// Gets or sets the servers defined in the OpenAPI spec.
@@ -383,7 +390,7 @@ public class Configuration : IReadableConfiguration
         {
             if (string.IsNullOrEmpty(value))
             {
-                _tempFolderPath = Path.GetTempPath();
+                _tempFolderPath = DefaultTempFolderPath.Value;
                 return;
             }
 
