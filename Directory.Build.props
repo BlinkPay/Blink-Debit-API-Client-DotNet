@@ -1,0 +1,13 @@
+<Project>
+
+  <PropertyGroup>
+    <!--
+      Pinned so both target frameworks compile identically. Without this the language version
+      defaults from the target framework (net8.0 => C# 12, net10.0 => C# 14), which would let a
+      C# 14 feature build on the net10.0 leg while breaking the net8.0 one.
+      Raise this to 14 once net8.0 support is dropped.
+    -->
+    <LangVersion>12</LangVersion>
+  </PropertyGroup>
+
+</Project>

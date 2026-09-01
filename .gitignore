@@ -2,6 +2,7 @@
 .claude.md
 .claude/
 *.user
+.DS_Store
 
 # Build results
 [Dd]ebug/

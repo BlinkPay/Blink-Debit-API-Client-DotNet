@@ -8,39 +8,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
+  snyk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '8.0.x'
-
-  cache:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v6
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
+          # Both SDKs: the 10.0 SDK builds every target framework, the 8.0 runtime runs the net8.0 tests
+          dotnet-version: |
+            8.0.x
+            10.0.x
       - name: Cache NuGet packages
         uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: ${{ runner.os }}-nuget-
-
-  snyk:
-    needs: cache
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
       - name: Restore NuGet packages
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
@@ -62,6 +46,25 @@ jobs:
         with:
           # Full history so SonarCloud can attribute new code accurately
           fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          # Both SDKs: the 10.0 SDK builds every target framework, the 8.0 runtime runs the net8.0 tests
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
       - name: Install SonarScanner
         run: dotnet tool install --global dotnet-sonarscanner
       - name: Restore NuGet packages
@@ -74,7 +77,8 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
       - name: Test
-        # Reuses the Release output above, so coverage is measured against the binaries Sonar analysed
+        # Reuses the Release output above, so coverage is measured against the binaries Sonar analysed.
+        # Runs once per target framework (net8.0 and net10.0).
         run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage;Format=opencover" /p:WarningLevel=0
         env:
           BLINKPAY_CLIENT_ID: ${{ vars.CLIENT_ID }}

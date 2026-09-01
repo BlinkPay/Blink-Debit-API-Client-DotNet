@@ -1,8 +1,8 @@
 # CLAUDE.md - BlinkPay .NET SDK Code Knowledge
 
-**Last Updated**: 2026-09-01
+**Last Updated**: 2026-09-02
 **Project**: Blink Debit API Client .NET SDK v1.5.0+
-**Framework**: .NET 8.0, C# 12
+**Framework**: .NET 8.0 and .NET 10.0 (multi-targeted), C# 12
 
 ---
 
@@ -11,7 +11,7 @@
 This is a .NET SDK for integrating with the BlinkPay Debit API, supporting both one-off (PayNow) and recurring (AutoPay) payment flows. The SDK handles OAuth2 authentication, consent management, payment processing, and refunds.
 
 **Repository**: BlinkPay/Blink-Debit-API-Client-DotNet
-**API Version**: v1.0.30 (OpenAPI 3.0.3)
+**API Version**: v1.0.54 (OpenAPI 3.0.4)
 **Environments**: Sandbox (`https://sandbox.debit.blinkpay.co.nz`) and Production (`https://debit.blinkpay.co.nz`)
 
 ---
