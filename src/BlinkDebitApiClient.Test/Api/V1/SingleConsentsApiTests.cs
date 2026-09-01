@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BlinkDebitApiClient.Api.V1;
 using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
@@ -73,7 +74,7 @@ public class SingleConsentsApiTests : IDisposable
     /// Verify that single consent with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that single consent with redirect flow is created, retrieved and revoked in PNZ")]
-    public async void SingleConsentWithRedirectFlowInPnz()
+    public async Task SingleConsentWithRedirectFlowInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -144,7 +145,7 @@ public class SingleConsentsApiTests : IDisposable
     /// Verify that rejected single consent with redirect flow is retrieved from PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that rejected single consent with redirect flow is retrieved from PNZ")]
-    public async void GetRejectedSingleConsentWithRedirectFlowFromPnz()
+    public async Task GetRejectedSingleConsentWithRedirectFlowFromPnz()
     {
         var consent = await _instance.GetSingleConsentAsync(Guid.Parse("0a52bdff-4d63-4c21-ae4f-8ef438d74532"));
 
@@ -171,7 +172,7 @@ public class SingleConsentsApiTests : IDisposable
     /// Verify that single consent with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that single consent with decoupled flow is created, retrieved and revoked in PNZ")]
-    public async void SingleConsentWithDecoupledFlowInPnz()
+    public async Task SingleConsentWithDecoupledFlowInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -243,7 +244,7 @@ public class SingleConsentsApiTests : IDisposable
     /// </summary>
     [Fact(DisplayName =
         "Verify that single consent with gateway flow and redirect flow hint is created, retrieved and revoked in PNZ")]
-    public async void SingleConsentWithGatewayFlowAndRedirectFlowHintInPnz()
+    public async Task SingleConsentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -333,7 +334,7 @@ public class SingleConsentsApiTests : IDisposable
     /// </summary>
     [Fact(DisplayName =
         "Verify that single consent with gateway flow and decoupled flow hint is created, retrieved and revoked in PNZ")]
-    public async void SingleConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
+    public async Task SingleConsentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -422,7 +423,7 @@ public class SingleConsentsApiTests : IDisposable
     /// Verify that single consent with redirect to app is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that single consent with redirect to app is created, retrieved and revoked in PNZ")]
-    public async void SingleConsentWithRedirectToAppInPnz()
+    public async Task SingleConsentWithRedirectToAppInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);

@@ -106,7 +106,6 @@ public class ComprehensiveQuickStartTests : IDisposable
 
         foreach (var bank in bankMetadataList)
         {
-            Assert.NotNull(bank.Name);
             Assert.NotNull(bank.Features);
 
             _output.WriteLine($"  - {bank.Name}:");

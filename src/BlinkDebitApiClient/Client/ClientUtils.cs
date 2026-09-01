@@ -47,7 +47,7 @@ public static class ClientUtils
     /// <returns>Filename</returns>
     public static string SanitizeFilename(string filename)
     {
-        var match = Regex.Match(filename, @".*[/\\](.*)$");
+        var match = Regex.Match(filename, @".*[/\\](.*)$", RegexOptions.None, TimeSpan.FromSeconds(1));
         return match.Success ? match.Groups[1].Value : filename;
     }
 
@@ -208,7 +208,8 @@ public static class ClientUtils
     /// Provides a case-insensitive check that a provided content type is a known JSON-like content type.
     /// </summary>
     public static readonly Regex JsonRegex =
-        new Regex("(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$");
+        new Regex("(?i)^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$",
+            RegexOptions.None, TimeSpan.FromSeconds(1));
 
     /// <summary>
     /// Check if the given MIME is a JSON MIME.

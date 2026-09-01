@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo><!-- setting GenerateAssemblyInfo to false causes this bug https://github.com/dotnet/project-system/issues/3934 -->
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <AssemblyName>BlinkDebitApiClient</AssemblyName>
     <PackageId>BlinkDebitApiClient</PackageId>
     <OutputType>Library</OutputType>
     <Authors>Rey Vincent Babilonia (rey.babilonia@blinkpay.co.nz)</Authors>
     <Company>BlinkPay</Company>
-    <AssemblyTitle>Blink Debit API Client for .NET 8</AssemblyTitle>
-    <Description>Blink Debit API Client for .NET 8</Description>
+    <AssemblyTitle>Blink Debit API Client for .NET</AssemblyTitle>
+    <Description>Blink Debit API Client for .NET 8 and .NET 10</Description>
     <Copyright>Copyright (c) 2023 BlinkPay</Copyright>
     <RootNamespace>BlinkDebitApiClient</RootNamespace>
-    <Version>1.7.0</Version>
+    <Version>1.8.0</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\BlinkDebitApiClient.xml</DocumentationFile>
     <RepositoryUrl>https://github.com/BlinkPay/Blink-Debit-API-Client-DotNet.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -25,30 +25,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JsonSubTypes" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    <PackageReference Include="JsonSubTypes" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Polly.Contrib.WaitAndRetry" Version="1.1.1" />
-    <PackageReference Include="RestSharp" Version="112.1.0" />
-    <PackageReference Include="Polly" Version="8.6.4" />
+    <PackageReference Include="RestSharp" Version="114.0.0" />
+    <PackageReference Include="Polly" Version="8.7.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.22.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="System.Web" />
     <None Include="../../README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\images\bp.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
       <Link>bp.png</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Web" />
   </ItemGroup>
 </Project>

@@ -10,11 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.release.target_commitish == 'master'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '8.0.x'
+          # Both SDKs: the 10.0 SDK builds every target framework, the 8.0 targeting pack covers net8.0
+          dotnet-version: |
+            8.0.x
+            10.0.x
           source-url: https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.NUGET_TOKEN }}
@@ -23,5 +26,7 @@ jobs:
           dotnet restore
           dotnet pack --configuration Release /p:PackageVersion=${{ github.event.release.tag_name }}
       - name: Push
-        run: 
-          dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_TOKEN }}
+        env:
+          NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+        run:
+          dotnet nuget push "**/*.nupkg" --api-key "$NUGET_TOKEN"

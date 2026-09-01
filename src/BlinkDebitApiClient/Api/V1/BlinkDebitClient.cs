@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using BlinkDebitApiClient.Client;
 using BlinkDebitApiClient.Client.Auth;
@@ -42,11 +43,6 @@ namespace BlinkDebitApiClient.Api.V1;
 /// </summary>
 public class BlinkDebitClient : IBlinkDebitClient
 {
-    /// <summary>
-    /// Shared Random instance for retry jitter to improve performance.
-    /// </summary>
-    private static readonly Random RetryRandom = new Random();
-
     private readonly ILogger _logger;
 
     private readonly SingleConsentsApi _singleConsentsApi;
@@ -203,13 +199,13 @@ public class BlinkDebitClient : IBlinkDebitClient
         RetryConfiguration.RetryPolicy = policyBuilder
             .WaitAndRetry(3, // Number of retries
                 retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) // Exponential back-off: 2, 4, 8 etc
-                                + TimeSpan.FromMilliseconds(RetryRandom.Next(0, 1000)) // plus some milliseconds random delay
+                                + TimeSpan.FromMilliseconds(RandomNumberGenerator.GetInt32(0, 1000)) // plus some milliseconds random delay
             );
 
         RetryConfiguration.AsyncRetryPolicy = policyBuilder
             .WaitAndRetryAsync(3, // Number of retries
                 retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) // Exponential back-off: 2, 4, 8 etc
-                                + TimeSpan.FromMilliseconds(RetryRandom.Next(0, 1000)) // plus some milliseconds random delay
+                                + TimeSpan.FromMilliseconds(RandomNumberGenerator.GetInt32(0, 1000)) // plus some milliseconds random delay
             );
     }
 

@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BlinkDebitApiClient.Api.V1;
 using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
@@ -68,7 +69,7 @@ public class BankMetadataApiTests : IDisposable
     /// Verify that bank metadata is retrieved
     /// </summary>
     [Fact(DisplayName = "Verify that bank metadata is retrieved")]
-    public async void GetMeta()
+    public async Task GetMeta()
     {
         var response = await _instance.GetMetaAsync(RequestHeaders);
         Assert.IsType<List<BankMetadata>>(response);

@@ -124,7 +124,8 @@ internal class CustomJsonCodec : IRestSerializer, ISerializer, IDeserializer
                 var filePath = string.IsNullOrEmpty(_configuration.TempFolderPath)
                     ? Path.GetTempPath()
                     : _configuration.TempFolderPath;
-                var regex = new Regex(@"Content-Disposition=.*filename=['""]?([^'""\s]+)['""]?$");
+                var regex = new Regex(@"Content-Disposition=.*filename=['""]?([^'""\s]+)['""]?$",
+                    RegexOptions.None, TimeSpan.FromSeconds(1));
                 foreach (var header in response.Headers)
                 {
                     var match = regex.Match(header.ToString());
@@ -544,7 +545,7 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
         {
             ClientCertificates = configuration.ClientCertificates,
             CookieContainer = cookies,
-            MaxTimeout = configuration.Timeout,
+            Timeout = TimeSpan.FromMilliseconds(configuration.Timeout),
             Proxy = configuration.Proxy,
             UserAgent = configuration.UserAgent,
             Authenticator = configuration.Authenticator
@@ -643,7 +644,7 @@ public class ApiClient : ISynchronousClient, IAsynchronousClient
         var clientOptions = new RestClientOptions(baseUrl)
         {
             ClientCertificates = configuration.ClientCertificates,
-            MaxTimeout = configuration.Timeout,
+            Timeout = TimeSpan.FromMilliseconds(configuration.Timeout),
             Proxy = configuration.Proxy,
             UserAgent = configuration.UserAgent,
             Authenticator = configuration.Authenticator

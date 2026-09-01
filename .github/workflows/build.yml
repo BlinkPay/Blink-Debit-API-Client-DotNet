@@ -8,43 +8,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
+  snyk:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '8.0.x'
-
-  cache:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
+          # Both SDKs: the 10.0 SDK builds every target framework, the 8.0 runtime runs the net8.0 tests
+          dotnet-version: |
+            8.0.x
+            10.0.x
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: ${{ runner.os }}-nuget-
-
-  snyk:
-    needs: cache
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
       - name: Restore NuGet packages
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/dotnet@master
+        uses: snyk/actions/dotnet@12140f4059e244892ae643824a95459a102120dd # master
         with:
           command: monitor
           args: --all-projects --exclude=BlinkDebitApiClient.Test
@@ -54,33 +38,53 @@ jobs:
           SNYK_PROJECT_NAME: blink-debit-api-client-dotnet
         continue-on-error: true
 
-  sonar:
+  build_test_sonar:
     needs: snyk
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+        with:
+          # Full history so SonarCloud can attribute new code accurately
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          # Both SDKs: the 10.0 SDK builds every target framework, the 8.0 runtime runs the net8.0 tests
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache NuGet packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
       - name: Install SonarScanner
         run: dotnet tool install --global dotnet-sonarscanner
       - name: Restore NuGet packages
         run: dotnet restore
-      - name: Run Sonar on blink-debit-api-client-dotnet to inspect code
-        run: |
-          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build --configuration Release --no-restore /p:WarningLevel=0
-          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+      - name: Begin Sonar analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
         continue-on-error: true
-
-  restore_build_test:
-    needs: sonar
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore dependencies
-        run: dotnet restore
       - name: Build
         run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
       - name: Test
-        run: dotnet test --no-restore --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:WarningLevel=0
+        # Reuses the Release output above, so coverage is measured against the binaries Sonar analysed.
+        # Runs once per target framework (net8.0 and net10.0).
+        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage;Format=opencover" /p:WarningLevel=0
         env:
           BLINKPAY_CLIENT_ID: ${{ vars.CLIENT_ID }}
           BLINKPAY_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - name: End Sonar analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+        continue-on-error: true

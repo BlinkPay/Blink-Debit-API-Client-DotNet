@@ -8,27 +8,77 @@
 # Table of Contents
 1. [Introduction](#introduction)
 2. [Contributing](#contributing)
-3. [Minimum Requirements](#minimum-requirements)
-4. [Dependency](#adding-the-dependency)
-5. [Quick Start](#quick-start)
-6. [Configuration](#configuration)
-7. [Client Creation](#client-creation)
-8. [Request ID, Correlation ID and Idempotency Key](#request-id-correlation-id-and-idempotency-key)
-9. [Full Examples](#full-examples)
-10. [Individual API Call Examples](#individual-api-call-examples)
+3. [Building and Testing Locally](#building-and-testing-locally)
+4. [Minimum Requirements](#minimum-requirements)
+5. [Dependency](#adding-the-dependency)
+6. [Quick Start](#quick-start)
+7. [Configuration](#configuration)
+8. [Client Creation](#client-creation)
+9. [Request ID, Correlation ID and Idempotency Key](#request-id-correlation-id-and-idempotency-key)
+10. [Full Examples](#full-examples)
+11. [Individual API Call Examples](#individual-api-call-examples)
 
 ## Introduction
-This SDK allows merchants with .NET 8-based e-commerce sites to seamlessly integrate with Blink PayNow and Blink AutoPay in order to accept digital payments.
+This SDK allows merchants with .NET 8- or .NET 10-based e-commerce sites to seamlessly integrate with Blink PayNow and Blink AutoPay in order to accept digital payments.
 
-This SDK is written in C# 12.
+This SDK is written in C# 12. The language version is pinned in `Directory.Build.props` so that both target frameworks compile identically — see [Minimum Requirements](#minimum-requirements) for the plan to move to C# 14.
 
 ## Contributing
 We welcome contributions from the community. Your pull request will be reviewed by our team.
 
 This project is licensed under the MIT License.
 
+## Building and Testing Locally
+
+### Prerequisites
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (check with `dotnet --version`) — required to build, as the package targets both `net8.0` and `net10.0`
+- The [.NET 8 runtime](https://dotnet.microsoft.com/download/dotnet/8.0) as well, to run the `net8.0` test pass
+
+### Compile
+From the repository root:
+```bash
+dotnet restore
+dotnet build --configuration Release
+```
+
+### Test
+Most tests are integration tests that call the real sandbox API, so sandbox OAuth credentials must be set as environment variables first:
+```bash
+export BLINKPAY_CLIENT_ID="your-sandbox-client-id"
+export BLINKPAY_CLIENT_SECRET="your-sandbox-client-secret"
+```
+
+Then run:
+```bash
+# Full suite
+dotnet test
+
+# With detailed output
+dotnet test --logger "console;verbosity=detailed"
+
+# A specific test class
+dotnet test --filter "FullyQualifiedName~QuickPaymentsApiTests"
+
+# Only the dependency injection extension tests (no credentials required)
+dotnet test src/BlinkDebitApiClient.Extensions.DependencyInjection.Test
+```
+
+Some tests are marked `Skip` because they require manual user authorisation in a browser — these are expected to be skipped.
+
 ## Minimum Requirements
-- .NET 8 or higher
+- .NET 8 or .NET 10
+
+The package multi-targets `net8.0` and `net10.0`, so it can be consumed from either.
+
+### Planned migration to C# 14
+
+[.NET 8 reaches end of life on 10 November 2026](https://dotnet.microsoft.com/platform/support/policy/dotnet-core). The `net8.0` target will be dropped in the next major version after that date, at which point:
+
+1. `<TargetFrameworks>` in each `.csproj` narrows to `net10.0` alone.
+2. `<LangVersion>` in `Directory.Build.props` is raised from `12` to `14`.
+3. The dual-SDK `setup-dotnet` steps in `.github/workflows/` drop back to `10.0.x` only.
+
+Until then the language version stays pinned at C# 12, because that is the highest version the `net8.0` target supports. This is deliberate: without the pin, the language version would default from the target framework (C# 12 for `net8.0`, C# 14 for `net10.0`) and a C# 14 feature would compile on one leg while breaking the other.
 
 ## Adding the dependency
 - If via your IDE, look for `BlinkDebitApiClient` in the NuGet tool

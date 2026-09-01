@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BlinkDebitApiClient.Api.V1;
 using BlinkDebitApiClient.Enums;
 using BlinkDebitApiClient.Model.V1;
@@ -72,7 +73,7 @@ public class QuickPaymentsApiTests : IDisposable
     /// Verify that quick payment with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that quick payment with redirect flow is created, retrieved and revoked in PNZ")]
-    public async void QuickPaymentWithRedirectFlowInPnz()
+    public async Task QuickPaymentWithRedirectFlowInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -147,7 +148,7 @@ public class QuickPaymentsApiTests : IDisposable
     /// Verify that rejected quick payment with redirect flow is retrieved from PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that rejected quick payment with redirect flow is retrieved from PNZ")]
-    public async void GetRejectedQuickPaymentWithRedirectFlowFromPnz()
+    public async Task GetRejectedQuickPaymentWithRedirectFlowFromPnz()
     {
         var quickPayment = await _instance.GetQuickPaymentAsync(Guid.Parse("057a08f7-4ee1-499d-8726-e4fe802d64fc"));
 
@@ -176,7 +177,7 @@ public class QuickPaymentsApiTests : IDisposable
     /// Verify that quick payment with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that quick payment with decoupled flow is created, retrieved and revoked in PNZ")]
-    public async void QuickPaymentWithDecoupledFlowInPnz()
+    public async Task QuickPaymentWithDecoupledFlowInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -251,7 +252,7 @@ public class QuickPaymentsApiTests : IDisposable
     /// Verify that quick payment with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that quick payment with redirect flow is created, retrieved and revoked in PNZ")]
-    public async void QuickPaymentWithGatewayFlowAndRedirectFlowHintInPnz()
+    public async Task QuickPaymentWithGatewayFlowAndRedirectFlowHintInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -344,7 +345,7 @@ public class QuickPaymentsApiTests : IDisposable
     /// Verify that quick payment with redirect flow is created, retrieved and revoked in PNZ
     /// </summary>
     [Fact(DisplayName = "Verify that quick payment with redirect flow is created, retrieved and revoked in PNZ")]
-    public async void QuickPaymentWithGatewayFlowAndDecoupledFlowHintInPnz()
+    public async Task QuickPaymentWithGatewayFlowAndDecoupledFlowHintInPnz()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);

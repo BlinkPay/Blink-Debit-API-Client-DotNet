@@ -88,7 +88,7 @@ public class RefundsApiTests : IDisposable
     /// </summary>
     [Fact(DisplayName =
         "Verify that account number refund for single consent with decoupled flow is created and retrieved")]
-    public async void CreateAccountNumberRefundForSingleConsentWithDecoupledFlow()
+    public async Task CreateAccountNumberRefundForSingleConsentWithDecoupledFlow()
     {
         // create single consent with decoupled flow
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -164,7 +164,7 @@ public class RefundsApiTests : IDisposable
     /// </summary>
     [Fact(DisplayName =
         "Verify that account number refund for enduring consent with decoupled flow is created and retrieved")]
-    public async void CreateAccountNumberRefundForEnduringConsentWithDecoupledFlow()
+    public async Task CreateAccountNumberRefundForEnduringConsentWithDecoupledFlow()
     {
         // create
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -239,7 +239,7 @@ public class RefundsApiTests : IDisposable
     /// Verify that full refund for single consent with decoupled flow is created and retrieved
     /// </summary>
     [Fact(DisplayName = "Verify that full refund for single consent with decoupled flow is created and retrieved")]
-    public async void CreateFullRefundForSingleConsentWithDecoupledFlow()
+    public async Task CreateFullRefundForSingleConsentWithDecoupledFlow()
     {
         // create single consent with decoupled flow
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -296,8 +296,8 @@ public class RefundsApiTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkNotImplementedException>(e);
-            Assert.Equal("Full refund is not yet implemented", e.Message);
+            Assert.IsType<BlinkInvalidValueException>(e);
+            Assert.Equal("Refund type [full_refund] is not yet supported for open banking payments — use an account-number refund instead, or contact BlinkPay", e.Message);
         }
     }
 
@@ -305,7 +305,7 @@ public class RefundsApiTests : IDisposable
     /// Verify that partial refund for single consent with decoupled flow is created and retrieved
     /// </summary>
     [Fact(DisplayName = "Verify that partial refund for single consent with decoupled flow is created and retrieved")]
-    public async void CreatePartialRefundForSingleConsentWithDecoupledFlow()
+    public async Task CreatePartialRefundForSingleConsentWithDecoupledFlow()
     {
         // create single consent with decoupled flow
         var decoupledFlow = new DecoupledFlow(Bank.PNZ, IdentifierType.PhoneNumber, "+64-259531933", CallbackUrl);
@@ -363,8 +363,8 @@ public class RefundsApiTests : IDisposable
         }
         catch (Exception e)
         {
-            Assert.IsType<BlinkNotImplementedException>(e);
-            Assert.Equal("Partial refund is not yet implemented", e.Message);
+            Assert.IsType<BlinkInvalidValueException>(e);
+            Assert.Equal("Refund type [partial_refund] is not yet supported for open banking payments — use an account-number refund instead, or contact BlinkPay", e.Message);
         }
     }
 }
