@@ -54,31 +54,23 @@ jobs:
           SNYK_PROJECT_NAME: blink-debit-api-client-dotnet
         continue-on-error: true
 
-  sonar:
+  build_test_sonar:
     needs: snyk
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Full history so SonarCloud can attribute new code accurately
+          fetch-depth: 0
       - name: Install SonarScanner
         run: dotnet tool install --global dotnet-sonarscanner
       - name: Restore NuGet packages
         run: dotnet restore
-      - name: Run Sonar on blink-debit-api-client-dotnet to inspect code
+      - name: Begin Sonar analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build --configuration Release --no-restore /p:WarningLevel=0
-          dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+        run: dotnet sonarscanner begin /k:"blink-debit-api-client-dotnet" /o:"blinkpay" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
         continue-on-error: true
-
-  restore_build_test:
-    needs: sonar
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Restore dependencies
-        run: dotnet restore
       - name: Build
         run: dotnet build --configuration Release --no-restore /p:WarningLevel=0
       - name: Test
@@ -86,3 +78,8 @@ jobs:
         env:
           BLINKPAY_CLIENT_ID: ${{ vars.CLIENT_ID }}
           BLINKPAY_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - name: End Sonar analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+        continue-on-error: true
